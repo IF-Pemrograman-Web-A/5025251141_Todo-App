@@ -273,10 +273,10 @@ berisi struktur halaman dan file CSS digunakan untuk mengatur tampilan.
 
 ## Preview 
 - Tampilan Desktop  
-![Desktop](desktop.png)
+![Desktop](assets/desktop.png)
 
 - Tapilan Mobile  
-![Mobile](mobile1.png)
-![Mobile](mobile2.png)
+![Mobile](assets/mobile2.png)  
+![Mobile](assets/mobile1.png)
 
 TERIMA KASIH 
