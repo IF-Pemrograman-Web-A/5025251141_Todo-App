@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TO DO LIST</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>TO-DO LISTKU</h1>
+    </header>
+    <div class="container">
+        <main class="panel-kiri">
+            <section class="list">
+                <h2>Daftar Tugas</h2>
+                <ul class="todo-list">
+                    <li class="todo-item">
+                        <input type="checkbox" checked>
+                        <div class="todo-info">
+                            <h3 class="done">Tugas E01A PWEB</h3>
+                            <span class="badge high">Penting</span>
+                            <p>Deadline: 14 September 2026</p>
+                        </div>
+                    </li>
+                    <li class="todo-item">
+                        <input type="checkbox">
+                        <div class="todo-info">
+                            <h3>Tugas KKA BFS, DFS, UCS</h3>
+                            <span class="badge medium">Sedang</span>
+                            <p>Deadline: 12 September 2026</p>
+                        </div>
+                    </li>
+                    <li class="todo-item">
+                        <input type="checkbox">
+                        <div class="todo-info">
+                            <h3>Tugas KPPL Resume</h3>
+                            <span class="badge low">Ringan</span>
+                            <p>Deadline: 15 September 2026</p>
+                        </div>
+                    </li>
+                </ul>
+            </section>
+        </main>
+        <aside class="panel-kanan">
+            <section class="form">
+                <h2>Detail/Edit</h2>
+                <form class="todo-form">
+                    <label for="judul">Judul Tugas</label><br>
+                    <input type="text" id="judul" value="Tugas E01A PWEB" required/>
+                    <br>
+                    <label for="desc">Deskripsi Tugas</label><br>
+                    <textarea id="desc" rows="3">Buat WEB TO DO LIST DENGAN HTML CSS</textarea>
+                    <br>
+                    <label for="deadline">Deadline</label><br>
+                    <input type="date" id="deadline" value="2026-09-14" required/>
+                    <br>
+                    <label>Prioritas</label><br>
+                    <select required>
+                        <option selected value="high">Penting</option>
+                        <option value="medium">Sedang</option>
+                        <option value="low">Ringan</option>
+                    </select>
+                    <button type="submit" title="Simpan">Simpan</button>
+                </form>
+            </section>
+        </aside>
+    </div>
+    <div class="addtask">
+        <section class="form">
+                <h2>Tambah Tugas Baru</h2>
+                <form class="todo-form">
+                    <label for="judul">Judul Tugas</label><br>
+                    <input type="text" id="judul" placeholder="Masukkan Judul..." required/>
+                    <br>
+                    <label for="desc">Deskripsi Tugas</label><br>
+                    <textarea id="desc" placeholder="Masukkan Deskripsi..." rows="3"></textarea>
+                    <br>
+                    <label for="deadline">Deadline</label><br>
+                    <input type="date" id="deadline" required/>
+                    <br>
+                    <label>Prioritas</label><br>
+                    <select required>
+                        <option selected value="high">Penting</option>
+                        <option value="medium">Sedang</option>
+                        <option value="low">Ringan</option>
+                    </select>
+                    <button type="submit" title="Tambah Tugas">Tambah Tugas</button>
+                </form>
+            </section>
+    </div>
+    <footer>
+        <p>2026 | MUHAMMAD FAHMI ILMI | 5025251141</p>
+    </footer>
+</body>
+</html>
