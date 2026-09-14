@@ -279,4 +279,14 @@ berisi struktur halaman dan file CSS digunakan untuk mengatur tampilan.
 ![Mobile](assets/mobile2.png)  
 ![Mobile](assets/mobile1.png)
 
+## VERSI 2 - JIKA ADA DETAIL/EDITOR  
+- Tampilan Desktop  
+![Desktop](assets/desktop1.png)
+![Desktop](assets/desktop2.png)
+
+- Tapilan Mobile  
+![Mobile](assets/mobile3.png)  
+![Mobile](assets/mobile4.png)
+![Mobile](assets/mobile5.png)
+
 TERIMA KASIH 
