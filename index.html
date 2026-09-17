@@ -9,6 +9,7 @@
 <body>
     <header>
         <h1>TO-DO LISTKU</h1>
+        <button type="button" id="btn-theme">🌙</button>
     </header>
     <div class="container">
         <main class="panel-kiri">
@@ -44,7 +45,7 @@
         </main>
         <aside class="panel-kanan">
             <section class="form">
-                <h2>Tambah Tugas Baru</h2>
+                <h2 id="add">Tambah Tugas Baru</h2>
                 <form class="todo-form">
                     <label for="judul">Judul Tugas</label><br>
                     <input type="text" id="judul" placeholder="Masukkan Judul..." required/>
@@ -56,7 +57,7 @@
                     <input type="date" id="deadline" required/>
                     <br>
                     <label>Prioritas</label><br>
-                    <select required>
+                    <select id="priority" required>
                         <option selected value="high">Penting</option>
                         <option value="medium">Sedang</option>
                         <option value="low">Ringan</option>
@@ -69,5 +70,6 @@
     <footer>
         <p>2026 | MUHAMMAD FAHMI ILMI | 5025251141</p>
     </footer>
+    <script src="script.js"></script>
 </body>
 </html>

@@ -7,7 +7,63 @@ body{
     background-color: #a2adec;
 }
 
-header h1{
+body.dark-mode {
+    background-color: #0f172a; 
+    color: #f8fafc;
+}
+
+body.dark-mode header,
+body.dark-mode footer p {
+    background-color: #1e293b;
+    border-color: #334155;
+}
+
+body.dark-mode #btn-theme {
+    background-color: #334155;
+}
+
+body.dark-mode .list,
+body.dark-mode .form {
+    background-color: #1e293b;
+    border-color: #3f51b5;
+}
+
+body.dark-mode .todo-item {
+    background-color: #0f172a;
+    border-color: #334155;
+}
+
+body.dark-mode .todo-info h3 {
+    color: #f8fafc;
+}
+
+body.dark-mode .todo-info p {
+    color: #94a3b8;
+}
+
+body.dark-mode .todo-form input,
+body.dark-mode .todo-form textarea,
+body.dark-mode .todo-form select {
+    background-color: #0f172a;
+    color: #f8fafc;
+    border-color: #334155;
+}
+
+body.dark-mode .todo-form input::placeholder,
+body.dark-mode .todo-form textarea::placeholder {
+    color: #64748b;
+}
+
+body.dark-mode .todo-form button {
+    background-color: #292a6e;
+    color: #ffffff;
+}
+
+body.dark-mode .todo-form button:hover {
+    background-color: #1d1b3a;
+}
+
+/* header h1{
     background-color: #546cf3;
     text-align: center;
     color: #ffffff;
@@ -15,6 +71,42 @@ header h1{
     margin: 0 0 25px 0;
     border: 3px dashed #a2adec;
     border-radius: 0 0 30px 30px;
+} */
+
+header {
+    background-color: #546cf3;
+    color: #ffffff;
+    padding: 15px 20px;
+    margin: 0 0 25px 0;
+    border: 3px dashed #a2adec;
+    border-radius: 0 0 30px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+}
+
+header h1 {
+    margin: 0;
+    flex: 1;
+    text-align: center;
+}
+
+#btn-theme {
+    position: absolute;
+    right: 25px;
+    background: transparent;
+    border: none;
+    background-color: white;
+    font-size: 1.5rem;
+    height: 40px;
+    width: 40px;
+    border-radius: 100%;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
 }
 
 .container {
