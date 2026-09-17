@@ -279,7 +279,203 @@ berisi struktur halaman dan file CSS digunakan untuk mengatur tampilan.
 ![Mobile](assets/mobile2.png)  
 ![Mobile](assets/mobile1.png)
 
-## VERSI 2 - JIKA ADA DETAIL/EDITOR  
+
+## PENJELASAN KODE JAVASCRIPT  
+Kode JavaScript dijalankan setelah seluruh elemen halaman termuat sempurna menggunakan event `DOMContentLoaded`. Berikut adalah rincian bagian kodenya:  
+
+### 1. Inisialisasi & Toggle Dark/Light Mode  
+```javascript
+document.addEventListener("DOMContentLoaded", () => {
+    const form = document.querySelector('.todo-form');
+    const todoList = document.querySelector('.todo-list');
+    const submitBtn = document.querySelector("button[type='submit']");
+    const hero = document.getElementById('add');
+    const btnTheme = document.getElementById('btn-theme');
+
+    btnTheme.addEventListener('click', function(){
+        document.body.classList.toggle('dark-mode');
+
+        if(document.body.classList.contains('dark-mode')) btnTheme.textContent = "☀️";
+        else btnTheme.textContent = "🌙";
+    });
+...
+```  
+
+Proses inisialisasi (deklarasi variabel) untuk mengambil elemen-elemen HTML ke dalam JavaScript menggunakan metode DOM (Document Object Model) agar bisa dimanipulasi nantinya. kemudian membuat togle darkmode dengan menambah event listener pada elemen ber id `btn-theme` sehingga saat di click akan mengubah tema tampilan web antara mode terang dan gelap (dark mode) dengan memanipulasi kelas CSS `dark-mode` pada elemen <body> serta mengubah ikon tombol.  
+
+### 2. Penanganan Event Form Submit (Tambah & Update Tugas)  
+```javascript
+let editingItem = null;
+
+    form.addEventListener("submit", function(e) {
+        e.preventDefault();
+
+        const judul = document.getElementById('judul').value;
+        const desc = document.getElementById('desc').value;
+        const deadline = document.getElementById('deadline').value;
+        const prioritas = document.getElementById('priority').value;
+
+        const li = document.createElement('li');
+        li.className = "todo-item";
+
+        let namaPriority = "Penting";
+
+        if(prioritas === "medium") namaPriority = "Sedang";
+        else if(prioritas === "low") namaPriority = "Rendah";
+
+        if (editingItem) {
+            const h3 = editingItem.querySelector("h3");
+            const badge = editingItem.querySelector(".badge");
+            const pDeadline = editingItem.querySelector(".todo-info p");
+            const pDesc = editingItem.querySelector(".desc");
+
+            h3.textContent = judul;
+            badge.className = `badge ${prioritas}`;
+            badge.textContent = namaPriority;
+            pDeadline.textContent = `Deadline: ${formatDate(deadline)}`;
+
+            editingItem.setAttribute("data-deadline", deadline);
+            editingItem.setAttribute("data-priority", prioritas);
+
+            if (desc) {
+                if (pDesc) {
+                    pDesc.textContent = desc;
+                } else {
+                    const newDescP = document.createElement("p");
+                    newDescP.className = "desc";
+                    newDescP.textContent = desc;
+                    editingItem.querySelector(".todo-info").appendChild(newDescP);
+                }
+            } else if (pDesc) {
+                pDesc.remove();
+            }
+
+            editingItem = null;
+            submitBtn.textContent = "Tambah Tugas";
+            hero.textContent = "Tambah Tugas Baru";
+        }
+        else {
+            li.setAttribute("data-deadline", deadline);
+            li.setAttribute("data-priority", prioritas);
+
+            li.innerHTML = `
+                <input type="checkbox">
+                <div class="todo-info">
+                    <h3>${judul}</h3>
+                    <span class="badge ${prioritas}">${namaPriority}</span>
+                    <p>Deadline: ${formatDate(deadline)}</p>
+                    <p class="desc">${desc}</p>
+                </div>
+
+                <div class="todo-actions">
+                    <button type="button" class="btn-edit">Edit</button>
+                    <button type="button" class="btn-delete">Hapus</button>
+                </div>
+            `
+
+            todoList.appendChild(li);
+
+            const btnDelete = li.querySelector('.btn-delete');
+            btnDelete.addEventListener('click', function(){
+                if(editingItem === li){
+                    editingItem = null;
+                    submitBtn.textContent = "Tambah Tugas";
+                    hero.textContent = "Tambah Tugas Baru";
+                    form.reset();
+                }
+                li.remove();
+            });
+
+            const btnEdit = li.querySelector('.btn-edit');
+            btnEdit.addEventListener('click', function(){
+                hero.textContent = "Edit Tugas"
+                editingItem = li;
+
+                document.getElementById('judul').value = li.querySelector('h3').textContent;
+                document.getElementById('deadline').value = li.getAttribute('data-deadline');
+                document.getElementById('priority').value = li.getAttribute('data-priority');
+
+                const descP = li.querySelector(".desc");
+                document.getElementById('desc').value = descP ? descP.textContent : "";
+
+                submitBtn.textContent = "Update Tugas";
+            });
+
+            const checkbox = li.querySelector('input[type="checkbox"]');
+            checkbox.addEventListener('change', function(){
+                const h3 = li.querySelector('h3');
+                if(checkbox.checked) h3.classList.add('done');
+                else h3.classList.remove('done');
+            });
+        }
+        form.reset();
+    });
+```
+Penjelasan:  
+- `let editingItem = null;` : Variabel penanda (state) untuk melacak apakah aplikasi sedang dalam mode mengedit tugas tertentu. Jika bernilai null, berarti form sedang dalam mode tambah tugas baru.  
+- `e.preventDefault();` : Perintah wajib untuk mencegah default behavior dari form HTML (yaitu melakukan reload atau refresh halaman secara otomatis saat tombol submit ditekan).   
+- Mengambil Input: Mengambil nilai teks, tanggal, dan tingkat prioritas yang diketik/dipilih oleh pengguna di dalam form.  
+- Label Prioritas: Mengubah nilai mentah dari value HTML (seperti "high", "medium", "low") menjadi teks ("Penting", "Sedang", "Rendah").  
+- Jika variabel `editingItem` tidak bernilai null (artinya pengguna sebelumnya mengklik tombol "Edit" pada salah satu tugas)  
+- Jika `editingItem` bernilai null, berarti ini pembuatan tugas baru dari awal.
+
+### 3. FITUR EDIT DAN HAPUS TUGAS  
+#### 3.1. Tombol Hapus  
+```javascript 
+const btnDelete = li.querySelector('.btn-delete');
+btnDelete.addEventListener('click', function(){
+    if(editingItem === li){
+        editingItem = null;
+        submitBtn.textContent = "Tambah Tugas";
+        hero.textContent = "Tambah Tugas Baru";
+        form.reset();
+    }
+    li.remove();
+});
+```  
+Berfungsi untuk menghapus tugas (li.remove()). Jika tugas yang sedang dihapus ternyata kebetulan sedang dalam status aktif diedit, form akan otomatis di-reset ke mode tambah tugas baru.  
+
+#### 3.2. Tombol Edit  
+```javascript 
+const btnEdit = li.querySelector('.btn-edit');
+btnEdit.addEventListener('click', function(){
+    hero.textContent = "Edit Tugas"
+    editingItem = li;
+
+    document.getElementById('judul').value = li.querySelector('h3').textContent;
+    document.getElementById('deadline').value = li.getAttribute('data-deadline');
+    document.getElementById('priority').value = li.getAttribute('data-priority');
+
+    const descP = li.querySelector(".desc");
+    document.getElementById('desc').value = descP ? descP.textContent : "";
+
+    submitBtn.textContent = "Update Tugas";
+});
+```  
+Mengubah judul panel form menjadi "Edit Tugas", merekam elemen `li` tersebut ke dalam variabel `editingItem`, lalu menarik kembali data tugas dari elemen HTML ke dalam kolom-kolom input form di sebelah kanan agar siap diubah oleh pengguna. Tombol submit juga diubah teksnya menjadi "Update Tugas".  
+
+#### 3.3. Checkbox Selesai  
+```javascript 
+const checkbox = li.querySelector('input[type="checkbox"]');
+checkbox.addEventListener('change', function(){
+    const h3 = li.querySelector('h3');
+    if(checkbox.checked) h3.classList.add('done');
+    else h3.classList.remove('done');
+});
+```
+Mendeteksi perubahan pada checkbox. Jika dicentang `checked`, kelas CSS `.done` ditambahkan ke elemen `h3` (akan muncul striketrough pada teks). Jika tidak dicentang, kelas tersebut dilepas kembali.  
+
+## Tampilan Setelah Ketambah Javascript  
+### 1. Tampilan Awal (Light Mode)  
+![Desktop](assets/lightmode.png)  
+### 2. Tampilan Awal (Dark Mode)  
+![Desktop](assets/darkmode.png)  
+### 3. Tambah Tugas  
+![Desktop](assets/addtask.png)  
+### 4. Edit Tugas
+![Desktop](assets/edittask.png)
+
+## VERSI 2 - JIKA ADA DETAIL/EDITOR  GAK JADI
 - Tampilan Desktop  
 ![Desktop](assets/desktop1.png)
 ![Desktop](assets/desktop2.png)

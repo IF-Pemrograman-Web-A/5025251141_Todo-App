@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const submitBtn = document.querySelector("button[type='submit']");
     const hero = document.getElementById('add');
     const btnTheme = document.getElementById('btn-theme');
+    const placeHolder = document.getElementById('placehold');
 
     btnTheme.addEventListener('click', function(){
         document.body.classList.toggle('dark-mode');
@@ -39,7 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
             h3.textContent = judul;
             badge.className = `badge ${prioritas}`;
             badge.textContent = namaPriority;
-            pDeadline.textContent = `Deadline: ${formatDate(deadline)}`;
+            pDeadline.textContent = `Deadline: ${deadline}`;
 
             editingItem.setAttribute("data-deadline", deadline);
             editingItem.setAttribute("data-priority", prioritas);
@@ -70,7 +71,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 <div class="todo-info">
                     <h3>${judul}</h3>
                     <span class="badge ${prioritas}">${namaPriority}</span>
-                    <p>Deadline: ${formatDate(deadline)}</p>
+                    <p>Deadline: ${deadline}</p>
                     <p class="desc">${desc}</p>
                 </div>
 
@@ -79,7 +80,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     <button type="button" class="btn-delete">Hapus</button>
                 </div>
             `
-
+            placeHolder.remove();
             todoList.appendChild(li);
 
             const btnDelete = li.querySelector('.btn-delete');
@@ -117,19 +118,4 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         form.reset();
     });
-
-    // todoList.addEventListener("change", function(e) {
-    //     if(e.target.type === "checkbox"){
-    //         const h3 = e.target.closest(".todo-item").querySelector("h3");
-    //         if(e.target.checked) h3.classList.add("done");
-    //         else h3.classList.remove("done");
-    //     }
-    // })
-
-    function formatDate(dateString) {
-        if (!dateString) return "-";
-        const options = { year: 'numeric', month: 'long', day: 'numeric' };
-        const date = new Date(dateString);
-        return date.toLocaleDateString('id-ID', options);
-    }
 });

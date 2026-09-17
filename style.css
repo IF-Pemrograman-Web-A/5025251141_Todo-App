@@ -78,7 +78,8 @@ header {
     color: #ffffff;
     padding: 15px 20px;
     margin: 0 0 25px 0;
-    border: 3px dashed #a2adec;
+    border-top: none;
+    border-bottom: 3px dashed #a2adec;
     border-radius: 0 0 30px 30px;
     display: flex;
     justify-content: space-between;
@@ -146,12 +147,16 @@ h2 {
 .todo-item {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 15px;
     margin-bottom: 15px;
     padding: 12px;
     border: 1px solid #606163c0;
     border-radius: 20px;
     list-style: none;
+}
+
+input[type="checkbox"] {
+    cursor: pointer;
 }
 
 .todo-info h3 {
@@ -164,6 +169,29 @@ h2 {
     margin: 4px 0 0 0;
     font-size: 13px;
     color: #64748b;
+}
+
+.todo-actions {
+    margin-left: auto;
+}
+
+.btn-delete {
+    padding: 10px;
+    border: none;
+    border-radius: 10px;
+    background-color: #f12b08;
+    color: #fff;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.btn-edit {
+    padding: 10px;
+    border: none;
+    border-radius: 10px;
+    background-color: #e5e912;
+    font-weight: 700;
+    cursor: pointer;
 }
 
 .badge {
@@ -250,5 +278,24 @@ footer p{
 
     .panel-kiri {
         order: 1;
+    }
+
+    .btn-delete {
+        padding: 5px;
+        border: none;
+        border-radius: 5px;
+        background-color: #f12b08;
+        color: #fff;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    .btn-edit {
+        padding: 5px;
+        border: none;
+        border-radius: 5px;
+        background-color: #e5e912;
+        font-weight: 700;
+        cursor: pointer;
     }
 }
