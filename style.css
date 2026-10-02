@@ -244,13 +244,13 @@ input[type="checkbox"] {
 }
 
 .badge.medium {
-    background-color: #f3a108;
-    color: #383737;
+    background-color: #c94102;
+    color: #f0ecec;
 }
 
 .badge.low {
-    background-color: #08f327;
-    color: #383737;
+    background-color: #023d0a;
+    color: #f8f4f4;
 }
 
 .done {
