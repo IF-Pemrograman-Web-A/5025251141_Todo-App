@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,44 +7,25 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <nav aria-label="Pintasan Navigasi" class="skip-links">
+        <a href="#heading-tugas" class="skip-link">Lewati ke Daftar Tugas</a>
+        <a href="#judul" class="skip-link">Lewati ke Form Tambah Tugas</a>
+    </nav>
+
     <header>
         <h1>TO-DO LISTKU</h1>
-        <button type="button" id="btn-theme">🌙</button>
+        <button type="button" id="btn-theme" aria-label="Ubah Mode tampilan Gelap atau Terang">🌙</button>
     </header>
     <div class="container">
         <main class="panel-kiri">
-            <section class="list">
-                <h2>Daftar Tugas</h2>
-                <ul class="todo-list">
+            <section class="list" aria-labelledby="heading-tugas">
+                <h2 id="heading-tugas" tabindex="-1">Daftar Tugas</h2>
+                <ul class="todo-list" aria-live="polite">
                     <p id="placehold">Tidak Ada Tugas Horee</p>
-                    <!-- <li class="todo-item">
-                        <input type="checkbox" checked>
-                        <div class="todo-info">
-                            <h3 class="done">Tugas E01A PWEB</h3>
-                            <span class="badge high">Penting</span>
-                            <p>Deadline: 14 September 2026</p>
-                        </div>
-                    </li>
-                    <li class="todo-item">
-                        <input type="checkbox">
-                        <div class="todo-info">
-                            <h3>Tugas KKA BFS, DFS, UCS</h3>
-                            <span class="badge medium">Sedang</span>
-                            <p>Deadline: 12 September 2026</p>
-                        </div>
-                    </li>
-                    <li class="todo-item">
-                        <input type="checkbox">
-                        <div class="todo-info">
-                            <h3>Tugas KPPL Resume</h3>
-                            <span class="badge low">Ringan</span>
-                            <p>Deadline: 15 September 2026</p>
-                        </div>
-                    </li> -->
                 </ul>
             </section>
         </main>
-        <aside class="panel-kanan">
+        <aside class="panel-kanan" aria-label="add">
             <section class="form">
                 <h2 id="add">Tambah Tugas Baru</h2>
                 <form class="todo-form">
@@ -70,7 +51,10 @@
                     <canvas id="cameraCanvas" style="display: none;"></canvas>
                     <button id="addLampiran" type="button" title="Take Picture">Take Picture</button>
                     <hr>
-                    <button type="submit" title="Tambah Tugas">Tambah Tugas</button>
+                    <div class="submitContainer">
+                        <button type="submit" title="Tambah Tugas">Tambah Tugas</button>
+                        <button type="button" id="batalBtn" title="Batal" hidden>Batal</button>
+                    </div>
                 </form>
             </section>
         </aside>

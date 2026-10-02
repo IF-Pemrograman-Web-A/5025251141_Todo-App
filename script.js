@@ -8,6 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const addLampiranBtn = document.getElementById("addLampiran");
     const cameraCanvas = document.getElementById('cameraCanvas');
     const videoElement = document.getElementById('cameraVideo');
+    const batalBtn = document.getElementById('batalBtn');
 
     let width = 300;
     let height = 240;
@@ -24,16 +25,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     async function requestNotificationPermission(){
         const result = await Notification.requestPermission();
-
         if(result === 'denied'){
             console.log('Izin Notifikasi ditolak');
             return;
         }
-
-        if(result === 'deafult'){
-            console.log('izin notifikasi diabaikan');
-        }
-
         console.log('notifikasi diizinkan');
     }
 
@@ -148,6 +143,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     document.getElementById("priority").value = todo.prioritas;
                     document.getElementById("waktuNotif").value = todo.waktuNotif || "";
 
+                    batalBtn.hidden = false;
+
                     if(todo.lampiran){
                         const context = cameraCanvas.getContext('2d');
                         const img = new Image();
@@ -171,10 +168,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         videoElement.srcObject = null;
                     }
 
-                    addLampiranBtn.disabled = false;
-                    addLampiranBtn.style.opacity = "1";
-                    addLampiranBtn.style.cursor = "pointer";
-
+                    addLampiranBtn.textContent = "Buka Kamera";
                     hero.textContent = "Edit Tugas";
                     submitBtn.textContent = "Update Tugas";
                 });
@@ -233,14 +227,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const prioritas = document.getElementById("priority").value;
         const waktuNotif = document.getElementById("waktuNotif").value;
 
-        // const todo = {
-        //     judul: judul,
-        //     desc: desc,
-        //     deadline: deadline,
-        //     prioritas: prioritas,
-        //     selesai: false
-        // };
-
         let transaction = db.transaction("todos", "readwrite");
         let store = transaction.objectStore("todos");
 
@@ -283,19 +269,22 @@ document.addEventListener("DOMContentLoaded", () => {
             tampilkanTodos();
             capturedImage = null;
             cameraCanvas.style.display = 'none';
-            startCamera();
+            videoElement.style.display = 'none';
+            addLampiranBtn.textContent = "Buka Kamera";
+
+            batalBtn.hidden = true;
         }
     });
 
-    function startCamera (){
+    function startCamera(){
         navigator.mediaDevices.getUserMedia({ video: true, audio: false })
         .then(stream => {
             videoElement.srcObject = stream;
             videoElement.style.display = 'block'; 
             videoElement.play();
 
-            addLampiranBtn.disabled = false;
             cameraCanvas.style.display = 'none';
+            addLampiranBtn.textContent = "Take Picture"; 
         })
         .catch(err => {
             console.error("Gagal mengakses kamera: ", err);
@@ -303,39 +292,41 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    startCamera();
-
-    function cameraTakePicture(){
-        if (!videoElement.srcObject) {
-            startCamera();
-            addLampiranBtn.textContent = "Capture";
-            return;
-        }
-
-        const context = cameraCanvas.getContext('2d');
-        if(width && height){
-            cameraCanvas.width = width;
-            cameraCanvas.height = height;
-            context.drawImage(videoElement, 0,0, width, height);
-            const data = cameraCanvas.toDataURL('image/png');
-
-            cameraCanvas.style.display = 'block';
-            console.log(data);
-
-            const stream = videoElement.srcObject;
-            if(stream){
-                const tracks = stream.getTracks();
-                tracks.forEach(track => track.stop());
-                videoElement.srcObject = null;
-            }
-            videoElement.style.display = 'none';
-            addLampiranBtn.disabled = true;
-            capturedImage = data;
-            return data;
-        }
-    }
-
     addLampiranBtn.addEventListener('click', () => {
-        cameraTakePicture();
-    })
+        const stream = videoElement.srcObject;
+        const isCameraActive = stream && videoElement.style.display !== 'none';
+
+        if (!isCameraActive) {
+            startCamera();
+        } else {
+            const context = cameraCanvas.getContext('2d');
+            if(width && height){
+                cameraCanvas.width = width;
+                cameraCanvas.height = height;
+                context.drawImage(videoElement, 0, 0, width, height);
+                const data = cameraCanvas.toDataURL('image/png');
+
+                cameraCanvas.style.display = 'block';
+                capturedImage = data;
+
+                stream.getTracks().forEach(track => track.stop());
+                videoElement.srcObject = null;
+                videoElement.style.display = 'none';
+
+                addLampiranBtn.textContent = "Ambil Ulang Foto / Buka Kamera";
+            }
+        }
+    });
+
+    batalBtn.addEventListener('click', () => {
+        form.reset();
+        editingIndex = null;
+        hero.textContent = "Tambah Tugas Baru"; 
+        submitBtn.textContent = "Tambah Tugas"; 
+        capturedImage = null;                  
+        cameraCanvas.style.display = 'none';  
+        videoElement.style.display = 'none'; 
+        addLampiranBtn.textContent = "Take Picture"; 
+        batalBtn.hidden = true; 
+    });
 });
