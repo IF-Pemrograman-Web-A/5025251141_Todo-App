@@ -219,6 +219,7 @@ input[type="checkbox"] {
 
 .done {
     text-decoration: line-through;
+    color: #4f5052 !important;
 }
 
 .todo-form label {

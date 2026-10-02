@@ -54,15 +54,22 @@
                     <label for="desc">Deskripsi Tugas</label><br>
                     <textarea id="desc" placeholder="Masukkan Deskripsi..." rows="3"></textarea>
                     <br>
-                    <label for="deadline">Deadline</label><br>
-                    <input type="date" id="deadline" required/>
-                    <br>
-                    <label>Prioritas</label><br>
+                    <!-- <label for="deadline">Deadline</label><br>
+                    <input type="date" id="deadline" required/> -->
+                    <label for="waktuNotif">Deadline</label><br>
+                    <input type="datetime-local" id="waktuNotif" required/><br>
+                    <label for="priority">Prioritas</label><br>
                     <select id="priority" required>
                         <option selected value="high">Penting</option>
                         <option value="medium">Sedang</option>
                         <option value="low">Ringan</option>
                     </select>
+                    <label for="addLampiran">Tambahkan Lampiran</label><br>
+                    <br>
+                    <video id="cameraVideo" autoplay playsinline style="width: 100%; max-width: 300px; display: none; border-radius: 10px; margin-bottom: 10px;"></video>
+                    <canvas id="cameraCanvas" style="display: none;"></canvas>
+                    <button id="addLampiran" type="button" title="Take Picture">Take Picture</button>
+                    <hr>
                     <button type="submit" title="Tambah Tugas">Tambah Tugas</button>
                 </form>
             </section>
