@@ -2,12 +2,104 @@
     font-family: Arial, Helvetica, sans-serif;
 }
 
+.skip-links {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+}
+
+.skip-link {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.skip-link:focus {
+    position: static;
+    width: auto;
+    height: auto;
+    padding: 8px 16px;
+    margin: 10px;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
+    background: #2563eb;
+    color: #ffffff;
+    font-weight: bold;
+    border-radius: 4px;
+    outline: 3px solid #ffeb3b;
+    display: inline-block;
+}
+
 body{
     margin: 0;
     background-color: #a2adec;
 }
 
-header h1{
+body.dark-mode {
+    background-color: #0f172a; 
+    color: #f8fafc;
+}
+
+body.dark-mode header,
+body.dark-mode footer p {
+    background-color: #1e293b;
+    border-color: #334155;
+}
+
+body.dark-mode #btn-theme {
+    background-color: #334155;
+}
+
+body.dark-mode .list,
+body.dark-mode .form {
+    background-color: #1e293b;
+    border-color: #3f51b5;
+}
+
+body.dark-mode .todo-item {
+    background-color: #0f172a;
+    border-color: #334155;
+}
+
+body.dark-mode .todo-info h3 {
+    color: #f8fafc;
+}
+
+body.dark-mode .todo-info p {
+    color: #94a3b8;
+}
+
+body.dark-mode .todo-form input,
+body.dark-mode .todo-form textarea,
+body.dark-mode .todo-form select {
+    background-color: #0f172a;
+    color: #f8fafc;
+    border-color: #334155;
+}
+
+body.dark-mode .todo-form input::placeholder,
+body.dark-mode .todo-form textarea::placeholder {
+    color: #64748b;
+}
+
+body.dark-mode .todo-form button {
+    background-color: #292a6e;
+    color: #ffffff;
+}
+
+body.dark-mode .todo-form button:hover {
+    background-color: #1d1b3a;
+}
+
+/* header h1{
     background-color: #546cf3;
     text-align: center;
     color: #ffffff;
@@ -15,6 +107,43 @@ header h1{
     margin: 0 0 25px 0;
     border: 3px dashed #a2adec;
     border-radius: 0 0 30px 30px;
+} */
+
+header {
+    background-color: #546cf3;
+    color: #ffffff;
+    padding: 15px 20px;
+    margin: 0 0 25px 0;
+    border-top: none;
+    border-bottom: 3px dashed #a2adec;
+    border-radius: 0 0 30px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+}
+
+header h1 {
+    margin: 0;
+    flex: 1;
+    text-align: center;
+}
+
+#btn-theme {
+    position: absolute;
+    right: 25px;
+    background: transparent;
+    border: none;
+    background-color: white;
+    font-size: 1.5rem;
+    height: 40px;
+    width: 40px;
+    border-radius: 100%;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
 }
 
 .container {
@@ -54,12 +183,16 @@ h2 {
 .todo-item {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 15px;
     margin-bottom: 15px;
     padding: 12px;
     border: 1px solid #606163c0;
     border-radius: 20px;
     list-style: none;
+}
+
+input[type="checkbox"] {
+    cursor: pointer;
 }
 
 .todo-info h3 {
@@ -72,6 +205,29 @@ h2 {
     margin: 4px 0 0 0;
     font-size: 13px;
     color: #64748b;
+}
+
+.todo-actions {
+    margin-left: auto;
+}
+
+.btn-delete {
+    padding: 10px;
+    border: none;
+    border-radius: 10px;
+    background-color: #f12b08;
+    color: #fff;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.btn-edit {
+    padding: 10px;
+    border: none;
+    border-radius: 10px;
+    background-color: #e5e912;
+    font-weight: 700;
+    cursor: pointer;
 }
 
 .badge {
@@ -88,17 +244,18 @@ h2 {
 }
 
 .badge.medium {
-    background-color: #f3a108;
-    color: #383737;
+    background-color: #c94102;
+    color: #f0ecec;
 }
 
 .badge.low {
-    background-color: #08f327;
-    color: #383737;
+    background-color: #023d0a;
+    color: #f8f4f4;
 }
 
 .done {
     text-decoration: line-through;
+    color: #4f5052 !important;
 }
 
 .todo-form label {
@@ -136,6 +293,17 @@ h2 {
     background-color: #a2adec;
 }
 
+.submitContainer {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+#addLampiran, #closeCamera {
+    cursor: pointer;
+}
+
 footer p{
     background-color: #546cf3;
     margin: 25px 0 0 0;
@@ -158,5 +326,24 @@ footer p{
 
     .panel-kiri {
         order: 1;
+    }
+
+    .btn-delete {
+        padding: 5px;
+        border: none;
+        border-radius: 5px;
+        background-color: #f12b08;
+        color: #fff;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    .btn-edit {
+        padding: 5px;
+        border: none;
+        border-radius: 5px;
+        background-color: #e5e912;
+        font-weight: 700;
+        cursor: pointer;
     }
 }

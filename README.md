@@ -1,10 +1,12 @@
-# [E01a] The Style Warrior - Todo List App
+# [E01a - E03] The Style Warrior - Todo List App
 
 Tugas membuat tampilan **Todo List** menggunakan HTML dan CSS sesuai dengan kriteria.
 
 | Nama                | NRP        |  Kelas     |
 | ------------------- | ---------- | ---------- |
-| Muhammad Fahmi Ilmi | 5025251141 | PWEB A     |
+| Muhammad Fahmi Ilmi | 5025251141 | PWEB A     |  
+
+<a href="#pembaruan--penjelasan-fitur-versi-e03">Menuju README Versi E03</a>
 
 ## Deskripsi
 
@@ -279,7 +281,708 @@ berisi struktur halaman dan file CSS digunakan untuk mengatur tampilan.
 ![Mobile](assets/mobile2.png)  
 ![Mobile](assets/mobile1.png)
 
-## VERSI 2 - JIKA ADA DETAIL/EDITOR  
+
+## PENJELASAN KODE JAVASCRIPT  
+Kode JavaScript dijalankan setelah seluruh elemen halaman termuat sempurna menggunakan event `DOMContentLoaded`. Berikut adalah rincian bagian kodenya:  
+
+### 1. Inisialisasi & Toggle Dark/Light Mode  
+```javascript
+document.addEventListener("DOMContentLoaded", () => {
+    const form = document.querySelector('.todo-form');
+    const todoList = document.querySelector('.todo-list');
+    const submitBtn = document.querySelector("button[type='submit']");
+    const hero = document.getElementById('add');
+    const btnTheme = document.getElementById('btn-theme');
+
+    let todos = [];
+    let editingIndex = null;
+
+    btnTheme.addEventListener('click', function(){
+        document.body.classList.toggle('dark-mode');
+
+        if(document.body.classList.contains('dark-mode')) btnTheme.textContent = "☀️";
+        else btnTheme.textContent = "🌙";
+    });
+...
+```  
+
+Proses inisialisasi (deklarasi variabel) untuk mengambil elemen-elemen HTML ke dalam JavaScript menggunakan metode DOM (Document Object Model) agar bisa dimanipulasi nantinya. kemudian membuat togle darkmode dengan menambah event listener pada elemen ber id `btn-theme` sehingga saat di click akan mengubah tema tampilan web antara mode terang dan gelap (dark mode) dengan memanipulasi kelas CSS `dark-mode` pada elemen <body> serta mengubah ikon tombol.  
+
+### 2. Penanganan Event Form Submit (Tambah & Update Tugas)  
+```javascript
+form.addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const judul = document.getElementById("judul").value;
+    const desc = document.getElementById("desc").value;
+    const deadline = document.getElementById("deadline").value;
+    const prioritas = document.getElementById("priority").value;
+
+    const todo = {
+        judul: judul,
+        desc: desc,
+        deadline: deadline,
+        prioritas: prioritas,
+        selesai: false
+    };
+
+    if (editingIndex !== null) {
+        todos[editingIndex] = todo;
+        editingIndex = null;
+        submitBtn.textContent = "Tambah Tugas";
+        hero.textContent = "Tambah Tugas Baru";
+    } else {
+        todos.push(todo);
+    }
+
+    tampilkanTodos();
+    form.reset();
+});
+```
+Penjelasan:  
+- `e.preventDefault();` : Perintah wajib untuk mencegah default behavior dari form HTML (yaitu melakukan reload atau refresh halaman secara otomatis saat tombol submit ditekan).   
+- Penyimpanan Objek (todo): Nilai input dari form dibungkus terlebih dahulu ke dalam struktur objek JavaScript agar data terorganisir dengan rapi.  
+- Jika `editingIndex` tidak bernilai null, artinya aplikasi sedang dalam mode edit, sehingga data pada indeks array tersebut ditimpa (todos[editingIndex] = todo).
+- Jika `editingIndex` bernilai null, data objek baru ditambahkan ke dalam array menggunakan metode `.push(todo)`.
+- `tampilkanTodos();`: Memanggil fungsi render ulang agar daftar tugas di layar langsung diperbarui secara dinamis tanpa refresh.  
+- `form.reset();` : Mengosongkan kembali kolom-kolom input pada form setelah data berhasil diproses.  
+
+### 3. FITUR EDIT DAN HAPUS TUGAS  
+#### 3.1. Tombol Hapus  
+```javascript 
+li.querySelector(".btn-delete").addEventListener("click", function() {
+    todos.splice(index, 1);
+    tampilkanTodos();
+});
+```  
+Berfungsi untuk menghapus data tugas dari dalam array todos berdasarkan indeksnya menggunakan metode . `splice(index, 1)`. Setelah itu, daftar tugas langsung dirender ulang.  
+
+#### 3.2. Tombol Edit  
+```javascript 
+li.querySelector(".btn-edit").addEventListener("click", function() {
+    editingIndex = index;
+    document.getElementById("judul").value = todo.judul;
+    document.getElementById("desc").value = todo.desc;
+    document.getElementById("deadline").value = todo.deadline;
+    document.getElementById("priority").value = todo.prioritas;
+
+    hero.textContent = "Edit Tugas";
+    submitBtn.textContent = "Update Tugas";
+});
+```  
+Mengubah judul panel form menjadi "Edit Tugas", merekam elemen `li` tersebut ke dalam variabel `editingItem`, lalu menarik kembali data tugas dari elemen HTML ke dalam kolom-kolom input form di sebelah kanan agar siap diubah oleh pengguna. Tombol submit juga diubah teksnya menjadi "Update Tugas".  
+
+#### 3.3. Checkbox Selesai  
+```javascript 
+li.querySelector('input[type="checkbox"]').addEventListener("change", function() {
+    todo.selesai = this.checked;
+    tampilkanTodos();
+});
+```
+Mendeteksi perubahan pada status checkbox (this.checked) dan memperbarui properti selesai pada objek terkait, kemudian memicu render ulang agar kelas CSS .done (efek coret pada teks) diterapkan dengan benar.  
+
+## Tampilan Setelah Ketambah Javascript  
+### 1. Tampilan Awal (Light Mode)  
+![Desktop](assets/lightmode.png)  
+### 2. Tampilan Awal (Dark Mode)  
+![Desktop](assets/darkmode.png)  
+### 3. Tambah Tugas  
+![Desktop](assets/addtask.png)  
+### 4. Edit Tugas
+![Desktop](assets/edittask.png)
+
+---
+
+## PEMBARUAN & PENJELASAN FITUR VERSI E03
+
+Pada pembaruan versi **E03**, aplikasi Todo List ditingkatkan dengan fitur penyimpanan persisten modern, integrasi perangkat keras (kamera) melalui web API, pemrosesan di latar belakang dan notifikasi (Service Worker), serta penerapan standar aksesibilitas web beserta *best practices*-nya.
+
+Berikut adalah rincian 5 pembaruan utama pada versi E03:
+
+---
+
+### 1. Implementasi Web Storage (IndexedDB & localStorage)
+Aplikasi sebelumnya hanya menyimpan data tugas pada memori JavaScript (array sementara) yang akan terhapus saat halaman di-refresh. Pada versi E03, sistem penyimpanan dibagi menjadi dua mekanisme Web Storage sesuai peruntukan datanya:
+- **IndexedDB**: Digunakan untuk menyimpan seluruh data Todo List (judul, deskripsi, prioritas, deadline/waktu notifikasi, status selesai, serta lampiran foto dalam format base64). IndexedDB dipilih karena mendukung kapasitas penyimpanan yang besar, transaksi terstruktur, dan pemrosesan asinkron tanpa memblokir antarmuka pengguna.
+- **localStorage**: Digunakan untuk menyimpan preferensi pengguna (*user preferences*), yaitu pilihan mode tema (*Light Mode* atau *Dark Mode*), sehingga preferensi tampilan tetap diingat saat pengguna membuka kembali halaman web.
+
+#### 1.1. Inisialisasi dan Pembuatan Object Store IndexedDB
+Database IndexedDB diberi nama `TodoDatabase` (versi `1`) dengan object store `todos` dan kunci primer `id` bertipe *autoIncrement*.
+
+*Kutipan kode (`script.js`):*
+```javascript
+const request = indexedDB.open("TodoDatabase", 1);
+
+request.onerror = function(event) {
+    console.log("Error: Gagal Membuka index DB", event.target.error);
+};
+
+request.onupgradeneeded = function(event){
+    db = event.target.result;
+    if(!db.objectStoreNames.contains("todos")){
+        db.createObjectStore("todos", {keyPath: "id", autoIncrement: true });
+    }
+};
+
+request.onsuccess = function(event){
+    db = event.target.result;
+    tampilkanTodos();
+};
+```
+*Penjelasan:*
+- `indexedDB.open("TodoDatabase", 1)`: Membuka koneksi ke database IndexedDB bernama `TodoDatabase`.
+- `onupgradeneeded`: Dipicu saat database pertama kali dibuat atau versi skema dinaikkan. Di sini dibuat object store baru bernama `"todos"` dengan kunci `id` yang nilainya otomatis bertambah secara unik (`autoIncrement: true`).
+- `onsuccess`: Berjalan setelah database siap digunakan, menyimpan instance database ke variabel `db`, lalu memanggil fungsi `tampilkanTodos()` untuk memuat data tugas ke layar.
+- `onerror`: Menangani kemungkinan galat saat membuka database.
+
+#### 1.2. Operasi CRUD dengan Transaksi IndexedDB
+Seluruh interaksi data Todo List beralih ke operasi database asinkron:
+
+- **Membaca Data (Read / getAll)**:
+  *Kutipan kode (`script.js`):*
+  ```javascript
+  function tampilkanTodos() {
+      if(!db) return;
+
+      let transaction = db.transaction("todos", "readonly");
+      let store = transaction.objectStore("todos");
+      let requestGetAll = store.getAll();
+
+      requestGetAll.onsuccess = function(event){
+          let todos = event.target.result;
+          todoList.innerHTML = "";
+
+          if (todos.length === 0) {
+              todoList.appendChild(placeHolder);
+              return;
+          }
+
+          todos.forEach((todo) => {
+              // Membuat elemen tugas secara dinamis...
+          });
+      };
+  }
+  ```
+  *Penjelasan:* Membuka transaksi `"readonly"` pada store `todos` dan memanggil `store.getAll()`. Jika tidak ada data, elemen placeholder "Tidak Ada Tugas Horee" ditampilkan.
+
+- **Menambah Data (Create / add)**:
+  *Kutipan kode (`script.js`):*
+  ```javascript
+  let transaction = db.transaction("todos", "readwrite");
+  let store = transaction.objectStore("todos");
+
+  let todoBaru = {
+      judul: judul, 
+      desc: desc,
+      prioritas: prioritas,
+      waktuNotif: waktuNotif,
+      selesai: false,
+      lampiran: capturedImage
+  };
+  store.add(todoBaru);
+  ```
+  *Penjelasan:* Membuka transaksi `"readwrite"` untuk menyimpan data tugas baru (termasuk string base64 foto dari kamera) ke dalam store menggunakan `store.add(todoBaru)`.
+
+- **Mengubah Data (Update / put)**:
+  *Kutipan kode (`script.js`):*
+  ```javascript
+  // Update data tugas yang diedit melalui form
+  let getReq = store.get(editingIndex);
+  getReq.onsuccess = function(event){
+      let todoLama = event.target.result;
+      let todoBaru = {
+          ...todoLama,
+          judul: judul,
+          desc: desc,
+          prioritas: prioritas,
+          waktuNotif: waktuNotif,
+          lampiran: capturedImage
+      };
+      store.put(todoBaru);
+  };
+
+  // Update status checklist selesai
+  li.querySelector('input[type="checkbox"]').addEventListener("change", function() {
+      todo.selesai = this.checked;
+      let transaction = db.transaction("todos", "readwrite");
+      let store = transaction.objectStore("todos");
+      let putReq = store.put(todo);
+
+      putReq.onsuccess = function(){
+          tampilkanTodos();
+      };
+  });
+  ```
+  *Penjelasan:* Menggunakan metode `store.put()` untuk menimpa data tugas yang sudah ada berdasarkan id-nya, baik saat pengguna mengedit teks/lampiran maupun saat mengubah status checkbox selesai.
+
+- **Menghapus Data (Delete / delete)**:
+  *Kutipan kode (`script.js`):*
+  ```javascript
+  li.querySelector(".btn-delete").addEventListener("click", function() {
+      let transaction = db.transaction("todos", "readwrite");
+      let store = transaction.objectStore("todos");
+      let deleteReq = store.delete(todo.id);
+
+      deleteReq.onsuccess = function () {
+          tampilkanTodos();
+      };
+  });
+  ```
+  *Penjelasan:* Menghapus rekaman tugas secara permanen dari IndexedDB melalui metode `store.delete(todo.id)` dan merender ulang daftar tugas setelah berhasil.
+
+#### 1.3. Penyimpanan Preferensi Tema Menggunakan localStorage
+Preferensi tema disimpan di `localStorage` agar dapat langsung dibaca dan diterapkan saat halaman pertama kali dibuka, mencegah efek layar berkedip (*flash of unstyled theme*).
+
+*Kutipan kode (`script.js`):*
+```javascript
+// Memeriksa preferensi tema tersimpan saat halaman dimuat
+const currentTheme = localStorage.getItem("theme");
+if(currentTheme === "dark"){
+    document.body.classList.add("dark-mode");
+    btnTheme.textContent = "☀️";
+} else {
+    btnTheme.textContent = "🌙";
+}
+
+// Menyimpan perubahan preferensi tema saat tombol toggle diklik
+btnTheme.addEventListener("click", function() {
+    document.body.classList.toggle("dark-mode");
+    if (document.body.classList.contains("dark-mode")) {
+        localStorage.setItem("theme", "dark");
+        btnTheme.textContent = "☀️";
+    } else {
+        localStorage.setItem("theme", "light");
+        btnTheme.textContent = "🌙";
+    }
+});
+```
+*Penjelasan:*
+- `localStorage.getItem("theme")`: Mengambil nilai tema yang tersimpan sebelumnya (`"dark"` atau `"light"`). Jika bernilai `"dark"`, class `.dark-mode` otomatis disematkan ke elemen `<body>`.
+- `localStorage.setItem("theme", "dark" / "light")`: Memperbarui nilai preferensi ke penyimpanan lokal browser setiap kali pengguna mengklik tombol toggle tema.
+
+---
+
+### 2. Implementasi Media Capture API (Kamera & Lampiran Gambar Todo)
+Fitur Media Capture API mengizinkan pengguna untuk mengambil foto secara langsung melalui kamera perangkat (webcam laptop atau kamera ponsel) untuk dilampirkan ke dalam catatan tugas.
+
+#### 2.1. Penambahan Elemen Kamera dan Lampiran pada Form
+Pada panel kanan (`form`), ditambahkan elemen `<video>` untuk live preview kamera, elemen `<canvas>` untuk proses pengambilan foto, serta tombol interaktif untuk kontrol kamera.
+
+*Kutipan kode HTML (`index.html`):*
+```html
+<label for="addLampiran">Tambahkan Lampiran</label><br>
+<br>
+<video id="cameraVideo" autoplay playsinline style="width: 100%; max-width: 300px; display: none; border-radius: 10px; margin-bottom: 10px;"></video>
+<canvas id="cameraCanvas" style="display: none;"></canvas>
+<button id="addLampiran" type="button" title="Take Picture">Take Picture</button>
+```
+*Penjelasan:*
+- `<video id="cameraVideo">`: Menampilkan umpan video langsung (*live stream*) dari kamera. Atribut `playsinline` memastikan video berjalan langsung di dalam halaman pada peramban mobile tanpa membuka pemutar layar penuh sistem operasi.
+- `<canvas id="cameraCanvas">`: Berfungsi untuk menangkap satu frame gambar diam (*still frame capture*) dari video dan mengonversinya menjadi data gambar.
+- `<button id="addLampiran">`: Tombol kontrol dinamis yang melayani aksi membuka kamera, mengambil gambar, atau mengambil ulang foto.
+
+#### 2.2. Mengakses Kamera dengan `navigator.mediaDevices.getUserMedia`
+*Kutipan kode JavaScript (`script.js`):*
+```javascript
+function startCamera(){
+    navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+    .then(stream => {
+        videoElement.srcObject = stream;
+        videoElement.style.display = 'block'; 
+        videoElement.play();
+
+        cameraCanvas.style.display = 'none';
+        addLampiranBtn.textContent = "Take Picture"; 
+    })
+    .catch(err => {
+        console.error("Gagal mengakses kamera: ", err);
+        alert("Tidak dapat mengakses kamera. Pastikan izin kamera diizinkan.");
+    });
+}
+```
+*Penjelasan:*
+- `navigator.mediaDevices.getUserMedia({ video: true, audio: false })`: Meminta izin kepada pengguna untuk mengaktifkan sensor kamera video tanpa audio.
+- `videoElement.srcObject = stream`: Memasukkan stream video langsung ke elemen `<video>`.
+- Jika hak akses kamera ditolak oleh pengguna atau perangkat tidak mendukung, blok `.catch` akan menangani galat dan menampilkan pesan alert yang jelas.
+
+#### 2.3. Menangkap Frame Foto & Menghentikan Stream Kamera
+*Kutipan kode JavaScript (`script.js`):*
+```javascript
+addLampiranBtn.addEventListener('click', () => {
+    const stream = videoElement.srcObject;
+    const isCameraActive = stream && videoElement.style.display !== 'none';
+
+    if (!isCameraActive) {
+        startCamera();
+    } else {
+        const context = cameraCanvas.getContext('2d');
+        if(width && height){
+            cameraCanvas.width = width;
+            cameraCanvas.height = height;
+            context.drawImage(videoElement, 0, 0, width, height);
+            const data = cameraCanvas.toDataURL('image/png');
+
+            cameraCanvas.style.display = 'block';
+            capturedImage = data;
+
+            // Hentikan hardware kamera demi privasi dan hemat daya
+            stream.getTracks().forEach(track => track.stop());
+            videoElement.srcObject = null;
+            videoElement.style.display = 'none';
+
+            addLampiranBtn.textContent = "Ambil Ulang Foto / Buka Kamera";
+        }
+    }
+});
+```
+*Penjelasan:*
+- `context.drawImage(videoElement, 0, 0, width, height)`: Menggambar frame dari video ke atas canvas 2D dengan dimensi proporsional 300x240 piksel.
+- `cameraCanvas.toDataURL('image/png')`: Mengubah hasil gambar canvas ke representasi string Data URL base64 berformat PNG. String inilah yang disimpan ke variabel `capturedImage` dan nantinya dimasukkan ke IndexedDB.
+- `track.stop()`: Menghentikan track perangkat keras kamera agar lampu indikator kamera mati setelah pemotretan selesai, menjaga privasi pengguna serta menghemat konsumsi daya.
+
+#### 2.4. Menampilkan Gambar Lampiran pada Daftar Tugas
+Pada tampilan daftar tugas, foto lampiran disajikan menggunakan elemen HTML5 semantik `<details>` dan `<summary>` yang dapat dibuka-tutup secara fleksibel:
+
+*Kutipan kode (`script.js`):*
+```javascript
+${todo.lampiran ? `
+    <details style="margin-top: 8px;">
+        <summary style="cursor: pointer; font-size: 12px; font-weight: bold; color: #546cf3;">Lihat Lampiran</summary>
+        <img src="${todo.lampiran}" alt="Lampiran Tugas" style="margin-top: 5px; width: 100%; max-width: 200px; border-radius: 8px; border: 1px solid #ccc;">
+    </details>
+` : ""}
+```
+
+---
+
+### 3. Implementasi Service Worker & Waktu Notifikasi Todo
+Untuk mendukung kinerja aplikasi modern serta menyediakan pengingat tenggat waktu (*reminders*), aplikasi mengintegrasikan **Service Worker** (`sw.js`) dan **Web Notification API**.
+
+#### 3.1. Penambahan Field Waktu Notifikasi / Deadline pada Form
+Field batas waktu tugas diperbarui dari input tanggal biasa (`date`) menjadi input tanggal dan waktu (`datetime-local`).
+
+*Kutipan kode HTML (`index.html`):*
+```html
+<label for="waktuNotif">Deadline</label><br>
+<input type="datetime-local" id="waktuNotif" required/><br>
+```
+*Penjelasan:* Elemen `<input type="datetime-local">` memungkinkan pengguna menentukan tanggal dan jam target selesai tugas secara spesifik, yang nantinya dijadikan acuan waktu notifikasi pengingat.
+
+#### 3.2. Pendaftaran Service Worker & Permintaan Izin Notifikasi
+Saat aplikasi dibuka pertama kali, aplikasi mendaftarkan berkas `sw.js` dan meminta izin notifikasi browser kepada pengguna.
+
+*Kutipan kode JavaScript (`script.js`):*
+```javascript
+if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('sw.js')
+        .then(reg => console.log('Service worker berhasil didaftarkan: ', reg.scope))
+        .catch(err => console.error('Service Worker Gagal', err));
+}
+
+async function requestNotificationPermission(){
+    const result = await Notification.requestPermission();
+    if(result === 'denied'){
+        console.log('Izin Notifikasi ditolak');
+        return;
+    }
+    console.log('notifikasi diizinkan');
+}
+
+if('Notification' in window){
+    requestNotificationPermission();
+}
+```
+*Penjelasan:*
+- `navigator.serviceWorker.register('sw.js')`: Mendaftarkan Service Worker pada root scope aplikasi.
+- `Notification.requestPermission()`: Menampilkan dialog izin notifikasi peramban kepada pengguna agar sistem operasi diizinkan memunculkan notifikasi desktop/mobile.
+
+#### 3.3. Logika Pemrosesan pada Service Worker (`sw.js`)
+Service Worker berjalan pada utas latar belakang (*background thread*) dan mendengarkan event pesan dari aplikasi utama melalui listener `message`.
+
+*Kutipan kode (`sw.js`):*
+```javascript
+self.addEventListener('install', (event) => {
+    console.log('Service Worker terinstal.');
+    self.skipWaiting();
+});
+
+self.addEventListener('activate', (event) => {
+    console.log('Service Worker aktif.');
+});
+
+self.addEventListener('message', (event) => {
+    if (event.data) {
+        const { type, judul, desc } = event.data;
+        
+        let title = '';
+        let options = {};
+
+        if (type === 'NEW_TODO') {
+            title = 'Todo Baru telah ditambahkan!';
+            options = {
+                body: `Judul: ${judul}\n${desc ? 'Deskripsi: ' + desc : 'Segera selesaikan tugasmu.'}`
+            };
+        } else if (type === 'REMINDER') {
+            title = `Pengingat Tugas: ${judul}`;
+            options = {
+                body: desc || 'Waktunya mengerjakan tugas ini sesuai jadwal!'
+            };
+        }
+
+        self.registration.showNotification(title, options);
+    }
+});
+```
+*Penjelasan:*
+- `self.skipWaiting()`: Memaksa Service Worker baru segera aktif tanpa menunggu sesi peramban ditutup.
+- `self.addEventListener('message', ...)`: Menerima payload data dari halaman utama. Berdasarkan atribut `type`:
+  - `NEW_TODO`: Memunculkan notifikasi instan bahwa tugas baru berhasil didaftarkan.
+  - `REMINDER`: Memunculkan notifikasi peringatan menjelang tenggat waktu tugas.
+- `self.registration.showNotification(title, options)`: Memanggil API notifikasi asli sistem operasi untuk memunculkan pesan visual kepada pengguna.
+
+#### 3.4. Notifikasi Instan dan Penjadwalan Pengingat Otomatis
+*Kutipan kode JavaScript (`script.js`):*
+```javascript
+// Notifikasi saat tugas baru berhasil disimpan
+function triggerNewTaskNotification(judul, desc) {
+    if (navigator.serviceWorker.controller) {
+        navigator.serviceWorker.controller.postMessage({
+            type: 'NEW_TODO',
+            judul: judul,
+            desc: desc
+        });
+    }
+}
+
+// Penjadwalan pengingat otomatis 10 menit sebelum deadline
+function scheduleNotification(judul, desc, waktuNotif) {
+    if (!waktuNotif) return;
+    const targetTime = new Date(waktuNotif).getTime();
+    const now = new Date().getTime();
+    const tenMinutesBefore = targetTime - (10 * 60 * 1000);
+    const delay = tenMinutesBefore - now;
+
+    if (delay > 0) {
+        setTimeout(() => {
+            if (navigator.serviceWorker.controller) {
+                navigator.serviceWorker.controller.postMessage({
+                    type: 'REMINDER',
+                    judul: judul,
+                    desc: `Pengingat: 10 menit lagi menuju waktu ${waktuNotif.replace('T', ' ')}`
+                });
+            }
+        }, delay);
+    }
+}
+```
+*Penjelasan:*
+- `triggerNewTaskNotification`: Mengirim pesan berjenis `'NEW_TODO'` ke Service Worker sesaat setelah tugas ditambahkan ke database.
+- `scheduleNotification`: Menghitung waktu 10 menit sebelum tenggat (`targetTime - (10 * 60 * 1000)`). Jika waktu pengingat berada di masa mendatang (`delay > 0`), disetel pengatur waktu `setTimeout` yang otomatis mengirim pesan `'REMINDER'` ke Service Worker saat waktunya tiba.
+
+---
+
+### 4. Implementasi Aksesibilitas (Accessibility) pada Seluruh Komponen
+Aksesibilitas web menjamin bahwa seluruh pengguna—termasuk penyandang disabilitas yang menggunakan teknologi pembaca layar (*screen reader*)—dapat mengakses dan menggunakan seluruh komponen aplikasi dengan mudah.
+
+#### 4.1. Bahasa Dokumen & Elemen Landmark Semantik
+*Kutipan kode HTML (`index.html`):*
+```html
+<!DOCTYPE html>
+<html lang="id">
+<head> ... </head>
+<body>
+    <nav aria-label="Pintasan Navigasi" class="skip-links"> ... </nav>
+    <header> ... </header>
+    <div class="container">
+        <main class="panel-kiri"> ... </main>
+        <aside class="panel-kanan" aria-label="add"> ... </aside>
+    </div>
+    <footer> ... </footer>
+</body>
+</html>
+```
+*Penjelasan:*
+- Atribut `lang="id"`: Menginstruksikan screen reader untuk menggunakan modul pelafalan Bahasa Indonesia, sehingga kata-kata dibacakan secara natural dan benar.
+- Elemen Landmark (`<nav>`, `<header>`, `<main>`, `<aside>`, `<footer>`): Membagi halaman ke dalam wilayah struktural formal, memudahkan pengguna screen reader melompat langsung ke bagian halaman tertentu menggunakan navigasi landmark.
+
+#### 4.2. Accessible Name pada Tombol Emoji & Form Inputs
+*Kutipan kode HTML (`index.html`):*
+```html
+<!-- Tombol ikonik yang diberi aria-label deskriptif -->
+<button type="button" id="btn-theme" aria-label="Ubah Mode tampilan Gelap atau Terang">🌙</button>
+
+<!-- Label terhubung eksplisit dengan atribut for dan id -->
+<label for="judul">Judul Tugas</label><br>
+<input type="text" id="judul" placeholder="Masukkan Judul..." required/>
+
+<label for="desc">Deskripsi Tugas</label><br>
+<textarea id="desc" placeholder="Masukkan Deskripsi..." rows="3"></textarea>
+
+<label for="waktuNotif">Deadline</label><br>
+<input type="datetime-local" id="waktuNotif" required/><br>
+
+<label for="priority">Prioritas</label><br>
+<select id="priority" required> ... </select>
+
+<label for="addLampiran">Tambahkan Lampiran</label><br>
+<button id="addLampiran" type="button" title="Take Picture">Take Picture</button>
+
+<div class="submitContainer">
+    <button type="submit" title="Tambah Tugas">Tambah Tugas</button>
+    <button type="button" id="batalBtn" title="Batal" hidden>Batal</button>
+</div>
+```
+*Penjelasan:*
+- Atribut `aria-label="Ubah Mode tampilan Gelap atau Terang"`: Memberikan nama aksesibel pada tombol tema yang hanya berisi ikon emoji, mencegah pembaca layar membaca karakter mentah emoji.
+- Pasangan atribut `for` pada `<label>` dan `id` pada kontrol form: Menghubungkan teks keterangan secara langsung dengan elemen input, mempermudah identifikasi form oleh teknologi bantu dan memperbesar area sentuh klik pada label.
+- Atribut `title` dan `type` eksplisit: Setiap tombol memiliki atribut `type="button"` atau `type="submit"` serta atribut `title` yang memberikan kejelasan peran (*role*) dan deskripsi fungsi tombol.
+
+#### 4.3. Hubungan Heading dan Kontainer melalui `aria-labelledby`
+*Kutipan kode HTML (`index.html`):*
+```html
+<section class="list" aria-labelledby="heading-tugas">
+    <h2 id="heading-tugas" tabindex="-1">Daftar Tugas</h2>
+    <ul class="todo-list" aria-live="polite">
+        <p id="placehold">Tidak Ada Tugas Horee</p>
+    </ul>
+</section>
+```
+*Penjelasan:*
+- `aria-labelledby="heading-tugas"`: Memberikan nama aksesibel pada elemen `<section class="list">` yang diambil langsung dari teks judul `<h2>`, sehingga screen reader dapat mengumumkan wilayah tersebut sebagai section "Daftar Tugas".
+- `tabindex="-1"` pada `<h2>`: Memungkinkan heading untuk menerima fokus terprogram dari skip-link tanpa mengacaukan urutan tab alami pengguna.
+
+#### 4.4. Pembaruan Dinamis dengan ARIA Live Region (`aria-live="polite"`)
+*Kutipan kode HTML (`index.html`):*
+```html
+<ul class="todo-list" aria-live="polite">
+```
+*Penjelasan:*
+- Atribut `aria-live="polite"`: Menetapkan kontainer daftar tugas sebagai *live region*. Saat tugas baru ditambahkan, dihapus, atau statusnya dicentang via JavaScript, perubahan tersebut langsung dibacakan oleh screen reader secara santun (*polite*) tanpa memotong pembacaan instruksi yang sedang berlangsung.
+
+---
+
+### 5. Penerapan Best Practices Kriteria Aksesibilitas (WCAG Compliance)
+Aplikasi Todo List menerapkan praktik terbaik (*best practices*) aksesibilitas sesuai pedoman **WCAG (Web Content Accessibility Guidelines)**:
+
+#### 5.1. Implementasi Skip Links (Pintasan Navigasi Keyboard)
+Bagi pengguna yang menavigasi website hanya dengan keyboard (tanpa mouse), *Skip Links* sangat krusial agar mereka tidak perlu menekan tombol `Tab` berulang-ulang melewati header untuk mencapai konten utama.
+
+*Kutipan kode HTML (`index.html`):*
+```html
+<nav aria-label="Pintasan Navigasi" class="skip-links">
+    <a href="#heading-tugas" class="skip-link">Lewati ke Daftar Tugas</a>
+    <a href="#judul" class="skip-link">Lewati ke Form Tambah Tugas</a>
+</nav>
+```
+
+*Kutipan kode CSS (`style.css`):*
+```css
+.skip-links {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+}
+
+.skip-link {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.skip-link:focus {
+    position: static;
+    width: auto;
+    height: auto;
+    padding: 8px 16px;
+    margin: 10px;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
+    background: #2563eb;
+    color: #ffffff;
+    font-weight: bold;
+    border-radius: 4px;
+    outline: 3px solid #ffeb3b;
+    display: inline-block;
+}
+```
+*Penjelasan:*
+- Teknik *visually-hidden* standar (`clip: rect(0, 0, 0, 0)`, `width: 1px`): Tautan disembunyikan dari pandangan pengguna biasa agar tidak mengganggu layout, tetapi tetap tersedia untuk pembaca layar.
+- Keadaan fokus `:focus`: Ketika pengguna menekan tombol `Tab` pertama kali di browser, tombol skip link seketika muncul di pojok kiri atas dengan latar belakang biru cerah (`#2563eb`) dan outline kontras tinggi berwarna kuning (`#ffeb3b`), memberikan indikator fokus visual yang sangat tegas.
+
+#### 5.2. Navigasi Penuh Menggunakan Keyboard & Manajemen Fokus
+- **Dukungan Keyboard 100%**: Pengguna dapat menggunakan tombol `Tab` dan `Shift + Tab` untuk berpindah antar seluruh komponen interaktif secara urut, tombol `Space` untuk mencentang checkbox dan membuka/menutup lampiran, serta tombol `Enter` untuk menjalankan tombol aksi dan mengirim form.
+- **Manajemen Fokus Tombol Batal**:
+  ```html
+  <button type="button" id="batalBtn" title="Batal" hidden>Batal</button>
+  ```
+  Tombol batal menggunakan atribut standar HTML `hidden`. Ketika tidak dalam mode edit, tombol benar-benar dihapus dari pohon aksesibilitas (*accessibility tree*) sehingga tidak dapat difokuskan oleh tombol `Tab` keyboard secara tidak sengaja.
+
+#### 5.3. Standar Rasio Kontras Warna (Color Contrast WCAG AA)
+- Warna latar belakang dan teks pada mode terang maupun gelap dirancang memiliki rasio kontras yang memenuhi standar minimum WCAG AA (minimal 4.5:1 untuk teks biasa):
+  *Kutipan kode CSS (`style.css`):*
+  ```css
+  /* Status badge prioritas kontras tinggi */
+  .badge.high {
+      background-color: red;
+      color: #ffff;
+  }
+  .badge.medium {
+      background-color: #c94102;
+      color: #f0ecec;
+  }
+  .badge.low {
+      background-color: #023d0a;
+      color: #f8f4f4;
+  }
+
+  /* Mode gelap dengan warna teks kontras */
+  body.dark-mode {
+      background-color: #0f172a; 
+      color: #f8fafc;
+  }
+  body.dark-mode .todo-info h3 {
+      color: #f8fafc;
+  }
+  body.dark-mode .todo-info p {
+      color: #94a3b8;
+  }
+  ```
+- **Prinsip *Not Color-Alone***: Status tugas selesai tidak hanya dibedakan berdasarkan perubahan warna teks, melainkan disertai garis coret (`text-decoration: line-through`) dan status centang checkbox native (`checked`) yang dibacakan secara gamblang oleh screen reader ("dicentang" / "tidak dicentang").
+
+#### 5.4. Aksesibilitas Gambar & Komponen Interaktif Native
+- Setiap gambar lampiran tugas memiliki atribut `alt="Lampiran Tugas"`:
+  ```html
+  <img src="${todo.lampiran}" alt="Lampiran Tugas" ...>
+  ```
+- Penggunaan elemen HTML5 bawaan `<details>` dan `<summary>` untuk lampiran foto memastikan fungsi buka-tutup lampiran dapat dioperasikan secara bawaan via tombol `Enter` atau `Space` tanpa memerlukan skrip JavaScript khusus.  
+
+## Tampilan Setelah Pembaruan E03  
+### 1. Tampilan Fitur Capture   
+![Desktop](assets/webcam.png)  
+### 2. Tampilan Detail Gambar Hasil Capture  
+![Desktop](assets/detail.png)  
+### 3. Tampilan Hasil Penyimpanan di IndexedDB  
+![Desktop](assets/indexdb.png)  
+### 4. Tampilan Hasil Preferensi tema di LocalStorage  
+![Desktop](assets/localstorage.png)  
+### 5. Tampilan pintasan link aksesibilatas saat Tab  
+![Desktop](assets/linkpintasan1.png)  
+![Desktop](assets/linkpintasan2.png)  
+### 6. Tampilan Hasil Notifikasi service worker  
+![Desktop](assets/notifikasi.png)  
+---
+
+TERIMA KASIH 
+
+## VERSI 2 - JIKA ADA DETAIL/EDITOR  GAK JADI
 - Tampilan Desktop  
 ![Desktop](assets/desktop1.png)
 ![Desktop](assets/desktop2.png)
@@ -288,5 +991,3 @@ berisi struktur halaman dan file CSS digunakan untuk mengatur tampilan.
 ![Mobile](assets/mobile3.png)  
 ![Mobile](assets/mobile4.png)
 ![Mobile](assets/mobile5.png)
-
-TERIMA KASIH 
