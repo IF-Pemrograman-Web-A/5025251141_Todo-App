@@ -38,6 +38,32 @@
     display: inline-block;
 }
 
+.main-nav {
+    display: flex;
+    gap: 10px;
+}
+
+.tab-btn {
+    padding: 8px 18px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    transition: all 0.2s ease;
+}
+
+.tab-btn:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.tab-btn.active {
+    background-color: #4f46e5; 
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
+}
+
 body{
     margin: 0;
     background-color: #a2adec;
@@ -219,6 +245,7 @@ input[type="checkbox"] {
     color: #fff;
     font-weight: 700;
     cursor: pointer;
+    text-decoration: none;
 }
 
 .btn-edit {
@@ -228,6 +255,8 @@ input[type="checkbox"] {
     background-color: #e5e912;
     font-weight: 700;
     cursor: pointer;
+    text-decoration: none;
+    color: #141414;
 }
 
 .badge {
@@ -328,22 +357,20 @@ footer p{
         order: 1;
     }
 
-    .btn-delete {
-        padding: 5px;
-        border: none;
-        border-radius: 5px;
-        background-color: #f12b08;
-        color: #fff;
-        font-weight: 700;
-        cursor: pointer;
+    .todo-actions {
+        display: flex;
+        flex-direction: row; 
+        gap: 6px;
+        margin-top: 8px;
+        margin-left: 0;
+        justify-content: flex-end; 
+        width: 100%;
     }
 
-    .btn-edit {
-        padding: 5px;
-        border: none;
-        border-radius: 5px;
-        background-color: #e5e912;
-        font-weight: 700;
-        cursor: pointer;
+    .btn-edit, .btn-delete {
+        padding: 5px 10px;
+        font-size: 12px;
+        font-weight: 600;
+        border-radius: 6px;
     }
 }
