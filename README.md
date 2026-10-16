@@ -1,4 +1,4 @@
-# [E01a - E03] The Style Warrior - Todo List App
+# [E01a - E04] The Style Warrior - Todo List App
 
 Tugas membuat tampilan **Todo List** menggunakan HTML dan CSS sesuai dengan kriteria.
 
@@ -6,7 +6,7 @@ Tugas membuat tampilan **Todo List** menggunakan HTML dan CSS sesuai dengan krit
 | ------------------- | ---------- | ---------- |
 | Muhammad Fahmi Ilmi | 5025251141 | PWEB A     |  
 
-<a href="#pembaruan--penjelasan-fitur-versi-e03">Menuju README Versi E03</a>
+<a href="#pembaruan--penjelasan-fitur-versi-e03">Menuju README Versi E03</a> | <a href="#pembaruan--penjelasan-fitur-versi-e04">Menuju README Versi E04</a>
 
 ## Deskripsi
 
@@ -978,7 +978,454 @@ Bagi pengguna yang menavigasi website hanya dengan keyboard (tanpa mouse), *Skip
 ![Desktop](assets/linkpintasan2.png)  
 ### 6. Tampilan Hasil Notifikasi service worker  
 ![Desktop](assets/notifikasi.png)  
+
 ---
+
+## PEMBARUAN & PENJELASAN FITUR VERSI E04
+
+---
+
+### 1. Implementasi Menu Bar / Navigasi (Personal & Shared)
+Fitur navigasi menu bar ditambahkan untuk memisahkan tugas ke dalam dua menu utama, yaitu **Personal** dan **Shared**:
+- **Menu Personal**: Menampilkan daftar tugas pribadi yang dimiliki khusus oleh pengguna/perangkat yang sedang aktif berdasarkan identifikasi akun pengguna (`user_id = $current_user_id`).
+- **Menu Shared**: Menampilkan daftar tugas bersama (publik/kolaboratif) yang dapat dilihat, ditambah, diselesaikan, atau dihapus oleh seluruh pengguna.
+
+#### 1.1. Komponen Navigasi Menu Bar (`menu-bar.php`)
+Komponen navigasi menu bar dipisahkan ke dalam modul tersendiri.
+
+*Kutipan kode (`menu-bar.php`):*
+```php
+<div class="main-nav" style="max-width: 1200px; margin: 0 auto 20px auto; padding: 0 20px; display: flex; gap: 10px;">
+    <a href="index.php?menu=personal" class="tab-btn <?= $kategori === 'personal' ? 'active' : ''; ?>">Personal</a>
+    <a href="index.php?menu=shared" class="tab-btn <?= $kategori === 'shared' ? 'active' : ''; ?>">Shared</a>
+</div>
+```
+*Penjelasan:*
+- `index.php?menu=personal` & `index.php?menu=shared`: Menggunakan query parameter HTTP GET (`?menu=...`) untuk berpindah kategori.
+- `<?= $kategori === 'personal' ? 'active' : ''; ?>`: Operator ternary PHP yang mengevaluasi kategori aktif. Jika menu yang dipilih sesuai dengan nilai variabel `$kategori`, kelas CSS `.active` disematkan untuk memberikan penanda visual tab aktif.
+
+#### 1.2. Filter Query Berdasarkan Menu Aktif (`index.php`)
+Pada berkas utama, nilai kategori dibaca dari parameter GET dan menentukan kueri SQL yang dieksekusi:
+
+*Kutipan kode (`index.php`):*
+```php
+$kategori = isset($_GET['menu']) ? $_GET['menu'] : 'personal';
+
+...
+
+if($kategori === 'personal'){
+    $query = "SELECT * FROM todos WHERE kategori = 'personal' AND user_id = $current_user_id";
+} else {
+    $query = "SELECT * FROM todos WHERE kategori = 'shared'";
+}
+$result = mysqli_query($conn, $query);
+```
+*Penjelasan:*
+- `isset($_GET['menu']) ? $_GET['menu'] : 'personal'`: Memeriksa parameter URL. Jika pengguna pertama kali membuka halaman tanpa parameter, sistem secara bawaan membuka menu `'personal'`.
+- Kondisi `'personal'`: Menyeleksi hanya tugas berkategori personal milik pengguna aktif (`user_id = $current_user_id`).
+- Kondisi `'shared'`: Menyeleksi seluruh tugas berkategori bersama tanpa membatasi `user_id`.
+
+---
+
+### 2. Migrasi Kode HTML ke PHP dan Desain Modular
+
+Berikut adalah struktur berkas yang dibuat:
+1. `config.php`: Modul koneksi database dan inisialisasi sesi pengguna.
+2. `header.php`: Modul bagian atas halaman (tag `<head>`, judul dinamis, skip-link aksesibilitas, dan tombol dark mode).
+3. `menu-bar.php`: Modul navigasi tab Personal dan Shared.
+4. `index.php`: Modul konten utama yang menggabungkan seluruh komponen antarmuka, menampilkan daftar tugas, dan menyediakan formulir tugas.
+5. `footer.php`: Modul penutup halaman (identitas pembuat dan pemanggilan berkas JavaScript).
+6. Berkas Aksi Pemrosesan: `proses.php`, `hapus.php`, dan `update-status.php` yang menangani logika manipulasi data secara terpisah dari tampilan.
+
+#### 2.1. Konfigurasi Database & Auto User Identification (`config.php`)
+Berkas ini bertugas membuka koneksi ke server MySQL sekaligus mendeteksi identitas pengguna unik perangkat menggunakan Cookie browser.
+
+*Kutipan kode (`config.php`):*
+```php
+<?php
+$host = "localhost:3307";
+$user = "root";
+$pass = "";
+$db = "db_todo";
+
+$conn = mysqli_connect($host, $user, $pass, $db);
+if(!$conn){
+    die("Koneksi gagal " . mysqli_connect_error());
+}
+
+if(!isset($_COOKIE['device_user_id'])){
+    $unique_name = "User_" . substr(md5(mt_rand()), 0, 6);
+
+    $insert_user = "INSERT INTO users(username, nama_lengkap) VALUES ('$unique_name', '$unique_name')";
+    mysqli_query($conn, $insert_user);
+
+    $new_user_id = mysqli_insert_id($conn);
+
+    setcookie('device_user_id', $new_user_id, time() + (86400 * 30), "/");
+    $current_user_id = $new_user_id;
+} else {
+    $current_user_id = intval($_COOKIE['device_user_id']);
+}
+?>
+```
+*Penjelasan:*
+- `mysqli_connect(...)`: Menghubungkan aplikasi ke database MySQL `db_todo` pada port 3307.
+- `if(!isset($_COOKIE['device_user_id']))`: Memeriksa apakah perangkat pengguna sudah memiliki pengenal unik. Jika belum ada, sistem secara otomatis:
+  1. Membuat nama acak unik (misalnya `14`) menggunakan fungsi hash `md5(mt_rand())`.
+  2. Mendaftarkan akun tersebut ke tabel `users`.
+  3. Mengambil ID akun yang baru saja dibuat dengan `mysqli_insert_id($conn)`.
+  4. Menyimpan ID tersebut ke dalam Cookie peramban dengan masa berlaku 30 hari (`time() + (86400 * 30)`).
+  5. Menetapkan ID ke variabel `$current_user_id`.
+  Dengan mekanisme ini, pengguna dapat langsung menggunakan fitur personal.
+
+#### 2.2. Modul Header (`header.php`)
+Memuat konfigurasi metadata HTML serta judul halaman yang menyesuaikan menu yang sedang aktif.
+
+*Kutipan kode (`header.php`):*
+```php
+<?php
+$kategori = isset($_GET['menu']) ? $_GET['menu'] : 'personal';
+?>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TO DO LIST - <?= ucfirst($kategori); ?></title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav aria-label="Pintasan Navigasi" class="skip-links">
+        <a href="#heading-tugas" class="skip-link">Lewati ke Daftar Tugas</a>
+        <a href="#judul" class="skip-link">Lewati ke Form Tambah Tugas</a>
+    </nav>
+
+    <header>
+        <h1>TO-DO LISTKU</h1>
+        <button type="button" id="btn-theme" aria-label="Ubah Mode tampilan Gelap atau Terang">🌙</button>
+    </header>
+```
+*Penjelasan:*
+- `<title>TO DO LIST - <?= ucfirst($kategori); ?></title>`: Menggunakan fungsi bawaan PHP `ucfirst()` agar huruf awal kategori menjadi kapital secara dinamis pada judul tab browser (misal: "TO DO LIST - Personal").
+- Struktur aksesibilitas seperti `<nav class="skip-links">` dan tombol tema tetap dipertahankan dari versi E03.
+
+#### 2.3. Penggabungan Modul pada Berkas Utama (`index.php`)
+Seluruh modul dirakit secara `include`:
+
+*Kutipan kode (`index.php`):*
+```php
+<?php
+include 'config.php';
+
+$kategori = isset($_GET['menu']) ? $_GET['menu'] : 'personal';
+
+$edit_data = null;
+if(isset($_GET['edit_id'])){
+    $edit_id = intval($_GET['edit_id']);
+    $edit_query = mysqli_query($conn, "SELECT * FROM todos WHERE id = $edit_id");
+    $edit_data = mysqli_fetch_assoc($edit_query);
+}
+
+if($kategori === 'personal'){
+    $query = "SELECT * FROM todos WHERE kategori = 'personal' AND user_id = $current_user_id";
+} else {
+    $query = "SELECT * FROM todos WHERE kategori = 'shared'";
+}
+$result = mysqli_query($conn, $query);
+
+include 'header.php';
+include 'menu-bar.php';
+?>
+...
+<!-- Konten Dua Panel (Daftar Tugas dan Formulir Tugas) -->
+...
+<?php include 'footer.php'; ?>
+```
+
+---
+
+### 3. Struktur Database Relasional & Berkas SQL (`data.sql`)
+
+#### 3.1. Skema Database (`data.sql`)
+
+*Kutipan kode (`data.sql`):*
+```sql
+CREATE DATABASE IF NOT EXISTS db_todo;
+USE db_todo;
+
+CREATE TABLE IF NOT EXISTS users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL,
+    nama_lengkap VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS todos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    judul VARCHAR(255) NOT NULL,
+    deskripsi TEXT,
+    waktu_notif DATETIME,
+    prioritas ENUM('high', 'medium', 'low') DEFAULT 'high',
+    lampiran LONGTEXT,
+    selesai BOOLEAN DEFAULT 0,
+    kategori ENUM('personal', 'shared') DEFAULT 'personal',
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+```
+*Penjelasan Kolom & Relasi:*
+1. **Tabel `users`**:
+   - `id`: Kunci primer (*Primary Key*) bertipe integer auto-increment untuk identifikasi unik setiap pengguna.
+   - `username`: Nama unik pengenal pengguna.
+   - `nama_lengkap`: Nama lengkap akun.
+2. **Tabel `todos`**:
+   - `id`: Kunci primer bertipe integer auto-increment untuk setiap item catatan tugas.
+   - `user_id`: Kunci tamu (*Foreign Key*) yang mereferensikan kolom `id` pada tabel `users`.
+   - `judul`: Judul tugas (`VARCHAR(255)`).
+   - `deskripsi`: Keterangan detail tugas bertipe teks panjang (`TEXT`).
+   - `waktu_notif`: Batas tenggat waktu dan jadwal pengingat bertipe `DATETIME`.
+   - `prioritas`: Tingkat urgensi menggunakan tipe `ENUM('high', 'medium', 'low')`.
+   - `lampiran`: Menyimpan data berkas foto tangkapan kamera dalam format string Base64 dengan tipe data kapasitas besar `LONGTEXT` (mampu menampung hingga 4 GB).
+   - `selesai`: Nilai boolean (`0` untuk belum selesai, `1` untuk selesai).
+   - `kategori`: Kategori ruang lingkup tugas bertipe `ENUM('personal', 'shared')`.
+   - `FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE`: Menjaga integritas referensial. Apabila baris data pengguna pada tabel `users` dihapus, seluruh data tugas personal miliknya di tabel `todos` otomatis ikut terhapus.
+--- 
+
+#### 3.2. Impor Basis Data ke MySQL
+1. **Melalui phpMyAdmin**: Buka menu tab *Import*, pilih berkas `data.sql`, lalu tekan tombol *Go".
+
+---
+
+### 4. Implementasi Operasi CRUD Menggunakan PHP & MySQL
+Seluruh manipulasi data Todo List kini diproses secara *server-side* melalui empat operasi CRUD (*Create, Read, Update, Delete*) dengan ekstensi MySQLi pada PHP:
+
+#### 4.1. Create (Menambah Tugas Baru)
+Pengguna mengisi form di panel kanan `index.php`. Form dikirimkan dengan metode `POST` menuju skrip pemroses `proses.php`.
+
+*Kutipan kode form (`index.php`):*
+```html
+<form class="todo-form" action="proses.php" method="POST">
+    <input type="hidden" name="id" value="<?= $edit_data['id'] ?? ''; ?>">
+    <input type="hidden" name="kategori" value="<?= $kategori; ?>">
+    <input type="hidden" name="lampiran" id="inputLampiran" value="<?= $edit_data['lampiran'] ?? ''; ?>">
+    ...
+```
+
+*Kutipan kode pemrosesan simpan (`proses.php`):*
+```php
+<?php
+include 'config.php';
+
+if($_SERVER['REQUEST_METHOD'] === 'POST'){
+    $id = $_POST['id'];
+    $judul = mysqli_real_escape_string($conn, $_POST['judul']);
+    $desc = mysqli_real_escape_string($conn, $_POST['desc']);
+    $waktuNotif = mysqli_real_escape_string($conn, $_POST['waktuNotif']);
+    $prioritas = mysqli_real_escape_string($conn, $_POST['prioritas']);
+    $kategori = mysqli_real_escape_string($conn, $_POST['kategori']);
+    $lampiran = $_POST['lampiran'];
+
+    if (!empty($id)){
+        $query = "UPDATE todos SET judul='$judul', deskripsi='$desc', waktu_notif='$waktuNotif', prioritas='$prioritas', lampiran='$lampiran' WHERE id=$id";
+    } else {
+        $uid = ($kategori === 'personal') ? $current_user_id : "NULL";
+        $query = "INSERT INTO todos (user_id, judul, deskripsi, waktu_notif, prioritas, lampiran, kategori) VALUES ($uid, '$judul', '$desc', '$waktuNotif', '$prioritas', '$lampiran', '$kategori')";
+    }
+
+    if(mysqli_query($conn, $query)){
+        header("Location: index.php?menu=" . $kategori);
+        exit;
+    } else {
+        echo "Gagal: " . mysqli_error($conn);
+    }
+}
+?>
+```
+*Penjelasan:*
+- `mysqli_real_escape_string(...)`: Melakukan sanitasi karakter khusus pada input pengguna.
+- `if (!empty($id))`: Memeriksa keberadaan input tersembunyi `id`. Jika kosong, sistem menjalankan kueri penambahan (`INSERT`).
+- `$uid = ($kategori === 'personal') ? $current_user_id : "NULL"`: Jika tugas berkategori personal, ID tugas dikaitkan dengan `$current_user_id`. Jika tugas bertipe shared, kolom `user_id` disetel ke `NULL`.
+- `header("Location: index.php?menu=" . $kategori)`: Mengarahkan pengguna kembali ke tab menu yang sesuai secara mulus setelah data tersimpan.
+
+#### 4.2. Read (Membaca & Merender Daftar Tugas)
+Daftar tugas diambil secara dinamis dari database dan ditampilkan di panel kiri halaman `index.php`.
+
+*Kutipan kode (`index.php`):*
+```php
+<ul class="todo-list" aria-live="polite">
+    <?php if(mysqli_num_rows($result) === 0): ?>
+        <p id="placehold">Tidak Ada Tugas Horee</p>
+    <?php else: ?>
+        <?php while($row = mysqli_fetch_assoc($result)): ?>
+            <li class="todo-item">
+                <input type="checkbox" <?= $row['selesai'] ? 'checked' : ''; ?>
+                       onclick="window.location.href='update-status.php?id=<?= $row['id']; ?>&status=<?= $row['selesai'] ? 0:1; ?>&menu=<?= $kategori; ?>'">
+                <div class="todo-info">
+                    <h3 class="<?= $row['selesai'] ? 'done':''; ?>">
+                        <?= htmlspecialchars($row['judul']); ?>
+                    </h3>
+                    <span class="badge <?= $row['prioritas']; ?>">
+                        <?= $row['prioritas'] === 'high' ? 'Penting' : ($row['prioritas'] === 'medium' ? 'Sedang': 'Ringan'); ?>
+                    </span>
+                    <?php if(!empty($row['waktu_notif'])): ?>
+                        <p>Deadline: <?= str_replace('T', ' ', $row['waktu_notif']); ?></p>
+                    <?php endif; ?>
+                    <?php if(!empty($row['deskripsi'])): ?>
+                        <p class="desc"><?= htmlspecialchars($row['deskripsi']); ?></p>
+                    <?php endif; ?>
+
+                    <?php if(!empty($row['lampiran'])): ?>
+                        <details style="margin-top: 8px;">
+                            <summary style="cursor: pointer; font-size: 12px; font-weight: bold; color: #546cf3;">Lihat Lampiran</summary>
+                            <img src="<?= $row['lampiran']; ?>" alt="Lampiran Tugas" style="margin-top: 5px; width: 100%; max-width: 200px; border-radius: 8px; border: 1px solid #ccc;">
+                        </details>
+                    <?php endif; ?>
+                </div>
+
+                <div class="todo-actions">
+                    <a href="index.php?menu=<?= $kategori; ?>&edit_id=<?= $row['id']; ?>" class="btn-edit">Edit</a>
+                    <a href="hapus.php?id=<?= $row['id']; ?>&menu=<?= $kategori; ?>" onclick="return confirm('Yakin ingin hapus?')" class="btn-delete">Hapus</a>
+                </div>
+            </li>
+        <?php endwhile; ?>
+    <?php endif; ?>
+</ul>
+```
+*Penjelasan:*
+- `mysqli_num_rows($result) === 0`: Menampilkan teks placeholder informatif saat tidak ada catatan tugas pada kategori yang dipilih.
+- `while($row = mysqli_fetch_assoc($result))`: Melakukan iterasi terhadap setiap baris hasil query basis data untuk membangun elemen `<li>` tugas secara dinamis.
+- Status selesai otomatis menambahkan kelas CSS `.done` yang memberi coretan garis pada teks judul tugas.
+
+#### 4.3. Update (Pembaruan Data & Pengubahan Status Selesai)
+Fitur pembaruan terbagi menjadi dua skenario:
+
+1. **Pengubahan Status Selesai / Checklist (`update-status.php`)**:
+   Ketika checkbox tugas diklik, peramban memicu pengalihan ke berkas `update-status.php` dengan status yang dibalik (`$row['selesai'] ? 0 : 1`).
+
+   *Kutipan kode (`update-status.php`):*
+   ```php
+   <?php
+   include 'config.php';
+
+   if (isset($_GET['id']) && isset($_GET['status'])) {
+       $id = intval($_GET['id']);
+       $status = intval($_GET['status']);
+       $menu = $_GET['menu'];
+       mysqli_query($conn, "UPDATE todos SET selesai = $status WHERE id = $id");
+       header("Location: index.php?menu=" . $menu);
+       exit;
+   }
+   ?>
+   ```
+   *Penjelasan:* Membaca parameter numerik ID tugas dan nilai status baru, menjalankan kueri `UPDATE todos SET selesai = $status WHERE id = $id`, lalu me-redirect kembali ke halaman menu aktif tanpa jeda.
+
+2. **Pengeditan Isi Data Tugas (`index.php` & `proses.php`)**:
+   Ketika tombol "Edit" diklik, halaman membuka `index.php?menu=...&edit_id=...`. Form pada panel kanan secara otomatis berubah ke mode pengeditan:
+   - Data tugas lama diambil via `SELECT * FROM todos WHERE id = $edit_id`.
+   - Kolom form terisi data lama (`value="<?= htmlspecialchars($edit_data['judul'] ?? ''); ?>"`).
+   - Judul form berubah menjadi "Edit Tugas", tombol submit berubah menjadi "Update Tugas", dan tombol "Batal" ditampilkan.
+   - Saat formulir disubmit, `proses.php` mendeteksi bahwa field `id` terisi sehingga mengeksekusi kueri `UPDATE todos SET ... WHERE id=$id`.
+
+#### 4.4. Delete (Menghapus Tugas)
+
+*Kutipan kode antarmuka (`index.php`):*
+```html
+<a href="hapus.php?id=<?= $row['id']; ?>&menu=<?= $kategori; ?>" onclick="return confirm('Yakin ingin hapus?')" class="btn-delete">Hapus</a>
+```
+
+*Kutipan kode pemrosesan hapus (`hapus.php`):*
+```php
+<?php
+include 'config.php';
+$id = $_GET['id'];
+$menu = $_GET['menu'];
+mysqli_query($conn, "DELETE FROM todos WHERE id = $id");
+header("Location: index.php?menu=" . $menu);
+exit;
+?>
+```
+*Penjelasan:*
+- `onclick="return confirm('Yakin ingin hapus?')"`: Menampilkan dialog konfirmasi JavaScript dengan confirm(). Jika pengguna menekan tombol "Batal" (*Cancel*), permintaan dibatalkan.
+- `DELETE FROM todos WHERE id = $id`: Menghapus baris tugas bersangkutan dari tabel basis data secara permanen, lalu mengembalikan tampilan ke menu yang sedang dibuka.
+
+---
+
+### 5. Implementasi File Handling Menggunakan PHP
+
+#### 5.1. File Handling Berbasis Media Capture  
+1. **Pengambilan Berkas Gambar di Sisi Klien**:
+   ```javascript
+   const data = cameraCanvas.toDataURL('image/png');
+   capturedImage = data;
+   document.getElementById('inputLampiran').value = capturedImage;
+   ```
+2. **Penerimaan & Penyimpanan Berkas di Sisi Server PHP**:
+   Data berkas string Base64 dikirim bersama payload form `POST` dan ditangkap oleh PHP di `proses.php`:
+   ```php
+   $lampiran = $_POST['lampiran'];
+   ```
+3. **Penyajian Berkas Lampiran ke Antarmuka**:
+   Pada `index.php`, PHP memeriksa apakah berkas lampiran tersedia dan menyajikannya langsung melalui atribut `src`:
+   ```php
+   <?php if(!empty($row['lampiran'])): ?>
+       <details style="margin-top: 8px;">
+           <summary style="cursor: pointer; font-size: 12px; font-weight: bold; color: #546cf3;">Lihat Lampiran</summary>
+           <img src="<?= $row['lampiran']; ?>" alt="Lampiran Tugas" style="margin-top: 5px; width: 100%; max-width: 200px; border-radius: 8px; border: 1px solid #ccc;">
+       </details>
+   <?php endif; ?>
+   ```
+4. **Pratinjau Berkas Lampiran Lama saat Mode Edit**:
+   Saat formulir berada dalam mode perbaikan tugas, berkas lampiran lama tetap dipratinjau sehingga pengguna dapat melihat foto sebelumnya atau memilih untuk mengambil foto baru:
+   ```php
+   <?php if(!empty($edit_data['lampiran'])): ?>
+       <div id="oldPreview" style="margin-bottom:10px;">
+           <img src="<?= $edit_data['lampiran']; ?>" style="width: 100%; max-width: 200px; border-radius: 8px;" alt="Preview">
+       </div>
+   <?php endif; ?>
+   ```
+
+#### 5.2. File Handling Berbasis Filesystem Server
+
+1. Pastikan Folder uploads ada  
+```php
+$upload_dir = "uploads/";
+    if (!is_dir($upload_dir)) {
+        mkdir($upload_dir, 0777, true);
+    }
+```
+2. Cek apakah ada data gambar baru dari kamera
+```php
+$path_file = $lampiran;
+
+    if (!empty($lampiran) && strpos($lampiran, 'data:image') === 0) {
+        
+        if (!empty($id)){
+            $old_query = mysqli_query($conn, "SELECT lampiran FROM todos WHERE id = $id");
+            if ($old_row = mysqli_fetch_assoc($old_query)) {
+                if (!empty($old_row['lampiran']) && file_exists($old_row['lampiran'])) {
+                    unlink($old_row['lampiran']);
+                }
+            }
+        }
+```  
+3. Simpan File Baru menggunakan fopen & fwrite  
+```php
+list(, $lampiran) = explode(',', $lampiran);
+        $path_file = $upload_dir . 'foto_' . time() . '.png';
+        
+        $handle = fopen($path_file, 'w');
+        if ($handle) {
+            fwrite($handle, base64_decode($lampiran));
+            fclose($handle);
+        }
+    }
+```
+---
+### GAMBAR
+![phpmyadmin](assets/image.png)  
+![phpmyadminTodos](assets/image-1.png)  
+![phpmyadminUsers](assets/image-2.png)  
+![todoPersonal](assets/image-3.png)  
+![todoShared](assets/image-4.png)  
 
 TERIMA KASIH 
 

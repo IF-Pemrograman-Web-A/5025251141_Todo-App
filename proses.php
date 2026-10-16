@@ -10,6 +10,34 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
     $kategori = mysqli_real_escape_string($conn, $_POST['kategori']);
     $lampiran = $_POST['lampiran'];
 
+    $upload_dir = "uploads/";
+    if (!is_dir($upload_dir)) {
+        mkdir($upload_dir, 0777, true);
+    }
+
+    $path_file = $lampiran;
+
+    if (!empty($lampiran) && strpos($lampiran, 'data:image') === 0) {
+        
+        if (!empty($id)){
+            $old_query = mysqli_query($conn, "SELECT lampiran FROM todos WHERE id = $id");
+            if ($old_row = mysqli_fetch_assoc($old_query)) {
+                if (!empty($old_row['lampiran']) && file_exists($old_row['lampiran'])) {
+                    unlink($old_row['lampiran']);
+                }
+            }
+        }
+
+        list(, $lampiran) = explode(',', $lampiran);
+        $path_file = $upload_dir . 'foto_' . time() . '.png';
+        
+        $handle = fopen($path_file, 'w');
+        if ($handle) {
+            fwrite($handle, base64_decode($lampiran));
+            fclose($handle);
+        }
+    }
+
     if (!empty($id)){
         $query = "UPDATE todos SET judul='$judul', deskripsi='$desc', waktu_notif='$waktuNotif', prioritas='$prioritas', lampiran='$lampiran' WHERE id=$id";
     } else {
