@@ -114,5 +114,5 @@ include 'menu-bar.php';
             </section>
         </aside>
     </div>
-
+<?php include 'install-btn.php'; ?>
 <?php include 'footer.php'; ?>

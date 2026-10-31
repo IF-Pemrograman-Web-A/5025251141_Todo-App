@@ -14,6 +14,38 @@ document.addEventListener("DOMContentLoaded", () => {
     let height = 240;
     let capturedImage = null;
 
+    let defferredPrompt;
+    const installBtn = document.getElementById('installBtn');
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        defferredPrompt = e;
+
+        // installBtn.style.display = 'block';
+        if(installContainer){
+            installContainer.style.display = 'flex';
+        }
+
+        installBtn.addEventListener('click', ()=> {
+            installContainer.style.display = 'none';
+            defferredPrompt.prompt();
+
+            defferredPrompt.userChoice.then((choiceResult) => {
+                if(choiceResult.outcome === 'accepted'){
+                    console.log('Pengguna menginstall PWA');
+                } else {
+                    console.log('menolak install');
+                }
+                defferredPrompt = null;
+            });
+        });
+    });
+
+    window.addEventListener('appinstalled', (evt) => {
+        console.log('PWA berhasil diinstall');
+        if(installContainer) installContainer.style.display = 'none';
+    })
+
     // let db;
     // let editingIndex = null;
 

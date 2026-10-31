@@ -237,6 +237,41 @@ input[type="checkbox"] {
     margin-left: auto;
 }
 
+.install-nav {
+    max-width: 1200px; 
+    margin: 0 auto 20px auto; 
+    padding: 15px 20px; 
+    display: flex; 
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    background-color: #141414;
+    border-radius: 12px;
+    color: #fff;
+}
+
+.install-info h3 {
+    margin: 0 0 4px 0;
+    font-size: 16px;
+}
+
+.install-info p {
+    margin: 0;
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+.install-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    background-color: #138b23;
+    color: #fff;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
 .btn-delete {
     padding: 10px;
     border: none;

@@ -8,6 +8,9 @@ $kategori = isset($_GET['menu']) ? $_GET['menu'] : 'personal';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TO DO LIST - <?= ucfirst($kategori); ?></title>
     <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#4f46e5">
+    <link rel="icon" type="image/png" href="assets/icon.png">
 </head>
 <body>
     <nav aria-label="Pintasan Navigasi" class="skip-links">
