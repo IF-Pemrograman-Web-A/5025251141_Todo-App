@@ -15,11 +15,22 @@
         h1 {
             color: #1e293b;
         }
+
+        .offline-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            background-color: #733280;
+            color: #fff;
+            font-weight: 700;
+            cursor: pointer;
+            white-space: nowrap;
+        }
     </style>
 </head>
 <body>
     <h1>Kamu Sedang Offline</h1>
     <p>Koneksi Internetmu terputus nihh.. benerin dong..</p>
-    <button onclick="window.location.reload()">Refresh</button>
+    <button class="offline-btn" onclick="window.location.reload()">Refresh</button>
 </body>
 </html>
